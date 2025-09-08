@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: anubis-backend
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MONGO_URI=${MONGO_URI}
+      - MAILTRAP_USERNAME=${MAILTRAP_USERNAME}
+      - MAILTRAP_PASSWORD=${MAILTRAP_PASSWORD}
+    volumes:
+      - ./logs:/app/logs
+
+networks:
+  anubis-network:
+    driver: bridge

@@ -1,0 +1,42 @@
+# Archivos de compilación
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Variables de entorno - NUNCA SUBIR
+.env
+.env.local
+.env.production
+
+# Base de datos local
+data/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Node modules (si hay frontend)
+node_modules/
+
+# Docker
+.dockerignore
+
+# Credenciales
+application-prod.properties
+*-secret.properties
