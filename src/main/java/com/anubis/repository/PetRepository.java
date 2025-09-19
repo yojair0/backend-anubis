@@ -1,11 +1,12 @@
 package com.anubis.repository;
 
-import com.anubis.model.Pet;
-import com.anubis.model.PetStatus;
+import java.util.List;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.anubis.model.Pet;
+import com.anubis.model.PetStatus;
 
 @Repository
 public interface PetRepository extends MongoRepository<Pet, String> {
@@ -21,4 +22,6 @@ public interface PetRepository extends MongoRepository<Pet, String> {
     List<Pet> findByStatusAndActiveTrue(PetStatus status);
     
     List<Pet> findBySpeciesAndActiveTrue(String species);
+    
+    void deleteByFoundationId(String foundationId);
 }

@@ -1,10 +1,11 @@
 package com.anubis.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "pets")
 public class Pet {
@@ -30,7 +31,11 @@ public class Pet {
     
     private PetStatus status;
     
-    private String foundationId; // ID de la fundación que publica
+    @DBRef
+    private Foundation foundation; // Referencia a la fundación
+    
+    // Mantener foundationId para compatibilidad con código existente
+    private String foundationId;
     
     private LocalDateTime createdAt;
     
@@ -125,6 +130,16 @@ public class Pet {
 
     public void setStatus(PetStatus status) {
         this.status = status;
+    }
+
+    public Foundation getFoundation() {
+        return foundation;
+    }
+
+    public void setFoundation(Foundation foundation) {
+        this.foundation = foundation;
+        // Mantener sincronización con foundationId para compatibilidad
+        this.foundationId = foundation != null ? foundation.getId() : null;
     }
 
     public String getFoundationId() {

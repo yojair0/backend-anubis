@@ -357,7 +357,98 @@ Authorization: Bearer {token}
 
 ## Administración
 
-### 1. Estadísticas del Sistema (Solo Administrador)
+### 1. Obtener Todos los Usuarios (Solo Administrador)
+**GET** `/api/admin/users`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "66de123456789abcdef01234",
+    "firstName": "Juan",
+    "lastName": "Pérez",
+    "email": "juan@email.com",
+    "phone": "555-1234",
+    "role": "USER",
+    "emailVerified": true,
+    "createdAt": "2024-09-15T10:30:00Z"
+  }
+]
+```
+
+### 2. Eliminar Usuario (Solo Administrador)
+**DELETE** `/api/admin/users/{userId}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response Exitoso:**
+```json
+{
+  "message": "✅ Usuario eliminado exitosamente"
+}
+```
+
+**Response Error:**
+```json
+{
+  "message": "❌ Usuario no encontrado"
+}
+```
+
+### 3. Estadísticas del Sistema (Solo Administrador)
+**GET** `/api/admin/statistics`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "message": "📊 Estadísticas del Sistema:\n👥 Usuarios: 150\n📋 Aplicaciones: 75\n🐕 Mascotas: 25\n"
+}
+```
+
+### 4. Contar Datos del Sistema (Solo Administrador)
+**GET** `/api/admin/count-data`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "message": "📊 Datos en base:\n👥 Usuarios: 150\n📋 Aplicaciones: 75\n"
+}
+```
+
+### 5. Limpiar Todos los Datos (Solo Administrador - ⚠️ PELIGROSO)
+**DELETE** `/api/admin/clear-all-data`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "message": "✅ Todos los datos han sido eliminados exitosamente"
+}
+```
+
+### 6. Estadísticas del Sistema (Solo Administrador) - LEGACY
 **GET** `/api/admin/stats`
 
 **Headers:**
@@ -442,6 +533,103 @@ Todas están disponibles para adopción y tienen imágenes de Unsplash.
 El backend acepta requests desde:
 - **Desarrollo**: `http://localhost:3000`
 - **Producción**: Configurar en variable `CORS_ORIGINS`
+
+## 🧪 PRUEBAS FINALES - SPRINT 5 (JAIRO)
+
+### Endpoints de Login - Casos de Prueba
+
+#### ✅ 1. Login Usuario Exitoso
+```bash
+curl -X POST http://localhost:8081/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "usuario@test.com",
+    "password": "password123"
+  }'
+```
+**Esperado**: Token JWT + datos usuario
+
+#### ✅ 2. Login con Credenciales Incorrectas
+```bash
+curl -X POST http://localhost:8081/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "wrong@test.com", 
+    "password": "wrongpass"
+  }'
+```
+**Esperado**: Error 401
+
+#### ✅ 3. Register Usuario
+```bash
+curl -X POST http://localhost:8081/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Test",
+    "lastName": "User", 
+    "email": "nuevo@test.com",
+    "password": "password123",
+    "phone": "555-0123"
+  }'
+```
+**Esperado**: Token + usuario creado
+
+### Endpoints de Postulaciones - Casos de Prueba
+
+#### ✅ 4. Crear Postulación
+```bash
+curl -X POST http://localhost:8081/api/applications/create \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "petId": "{petId}",
+    "contactNumber": "555-0123",
+    "reason": "Quiero adoptar esta mascota",
+    "experienceWithPets": "He tenido perros toda mi vida"
+  }'
+```
+
+#### ✅ 5. Mis Postulaciones
+```bash
+curl -X GET http://localhost:8081/api/applications/user/my-applications \
+  -H "Authorization: Bearer {token}"
+```
+
+#### ✅ 6. Cambiar Estado Postulación (Admin)
+```bash
+curl -X PUT http://localhost:8081/api/applications/{id}/status \
+  -H "Authorization: Bearer {admin-token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "ACCEPTED",
+    "response": "¡Felicitaciones! Tu postulación ha sido aceptada"
+  }'
+```
+
+### Endpoints de Administración - Casos de Prueba
+
+#### ✅ 7. Eliminar Usuario (Admin)
+```bash
+curl -X DELETE http://localhost:8081/api/admin/users/{userId} \
+  -H "Authorization: Bearer {admin-token}"
+```
+
+#### ✅ 8. Estadísticas del Sistema
+```bash
+curl -X GET http://localhost:8081/api/admin/statistics \
+  -H "Authorization: Bearer {admin-token}"
+```
+
+### Lista de Verificación Final
+
+- [ ] Login funciona correctamente
+- [ ] Register crea usuarios sin errores
+- [ ] Validaciones de email/password funcionan
+- [ ] Postulaciones se crean correctamente
+- [ ] Emails se envían al cambiar estado
+- [ ] Admin puede eliminar usuarios
+- [ ] Todas las validaciones de roles funcionan
+- [ ] Manejo de errores es consistente
 
 ## Ejemplos de Implementación
 

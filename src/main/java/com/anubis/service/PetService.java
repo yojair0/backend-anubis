@@ -17,6 +17,10 @@ public class PetService {
     @Autowired
     private PetRepository petRepository;
     
+    public List<Pet> getAllPets() {
+        return petRepository.findByActiveTrue();
+    }
+    
     public List<Pet> getAllActivePets() {
         return petRepository.findByActiveTrue();
     }
@@ -35,6 +39,14 @@ public class PetService {
     
     public List<Pet> getPetsBySpecies(String species) {
         return petRepository.findBySpeciesAndActiveTrue(species);
+    }
+    
+    public List<Pet> getPetsByStatus(PetStatus status) {
+        return petRepository.findByStatusAndActiveTrue(status);
+    }
+    
+    public Pet savePet(Pet pet) {
+        return petRepository.save(pet);
     }
     
     public Pet createPet(Pet pet) {

@@ -1,5 +1,14 @@
 package com.anubis.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.anubis.dto.ApplicationDetailResponse;
 import com.anubis.dto.ApplicationRequest;
 import com.anubis.dto.ApplicationStatusRequest;
 import com.anubis.model.Application;
@@ -10,12 +19,6 @@ import com.anubis.model.User;
 import com.anubis.repository.ApplicationRepository;
 import com.anubis.repository.PetRepository;
 import com.anubis.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ApplicationService {
@@ -144,5 +147,39 @@ public class ApplicationService {
 
     public long countApplicationsByStatus(ApplicationStatus status) {
         return applicationRepository.findByStatus(status).size();
+    }
+
+    // Métodos nuevos con datos detallados
+    public List<ApplicationDetailResponse> getDetailedApplicationsByUser(String userId) {
+        List<Application> applications = applicationRepository.findByUserId(userId);
+        return applications.stream()
+            .map(app -> {
+                Pet pet = petRepository.findById(app.getPetId()).orElse(null);
+                User user = userRepository.findById(app.getUserId()).orElse(null);
+                return new ApplicationDetailResponse(app, pet, user);
+            })
+            .collect(Collectors.toList());
+    }
+
+    public List<ApplicationDetailResponse> getDetailedApplicationsByFoundation(String foundationId) {
+        List<Pet> foundationPets = petRepository.findByFoundationId(foundationId);
+        return foundationPets.stream()
+            .flatMap(pet -> applicationRepository.findByPetId(pet.getId()).stream()
+                .map(app -> {
+                    User user = userRepository.findById(app.getUserId()).orElse(null);
+                    return new ApplicationDetailResponse(app, pet, user);
+                }))
+            .collect(Collectors.toList());
+    }
+
+    public Optional<ApplicationDetailResponse> getDetailedApplicationById(String applicationId) {
+        Optional<Application> applicationOpt = applicationRepository.findById(applicationId);
+        if (applicationOpt.isPresent()) {
+            Application application = applicationOpt.get();
+            Pet pet = petRepository.findById(application.getPetId()).orElse(null);
+            User user = userRepository.findById(application.getUserId()).orElse(null);
+            return Optional.of(new ApplicationDetailResponse(application, pet, user));
+        }
+        return Optional.empty();
     }
 }

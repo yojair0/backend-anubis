@@ -1,7 +1,7 @@
 package com.anubis.config;
 
-import com.anubis.security.CustomUserDetailsService;
-import com.anubis.security.JwtAuthenticationFilter;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import com.anubis.security.CustomUserDetailsService;
+import com.anubis.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -63,7 +64,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Rutas públicas
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/pets/public/**").permitAll()
+                .requestMatchers("/api/pets", "/api/pets/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/health").permitAll()
                 .requestMatchers("/api/admin/clear-all-data").permitAll()
                 .requestMatchers("/api/admin/count-data").permitAll()

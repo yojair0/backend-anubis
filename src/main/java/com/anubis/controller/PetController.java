@@ -17,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.anubis.dto.PetRequest;
 import com.anubis.model.Pet;
 import com.anubis.model.PetStatus;
 import com.anubis.security.UserPrincipal;
 import com.anubis.service.PetService;
+import com.anubis.service.FileUploadService;
 
 import jakarta.validation.Valid;
 
@@ -34,41 +36,60 @@ public class PetController {
     @Autowired
     private PetService petService;
 
-    @GetMapping
-    public ResponseEntity<?> getAllPets() {
-        try {
-            List<Pet> pets = petService.getAvailablePets();
-            return ResponseEntity.ok(pets);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+    @Autowired
+    private FileUploadService fileUploadService;
+
+    public static class MessageResponse {
+        private String message;
+
+        public MessageResponse(String message) {
+            this.message = message;
         }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
+    public static class ImageUploadResponse {
+        private String imageUrl;
+
+        public ImageUploadResponse(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Pet>> getAllPets() {
+        List<Pet> pets = petService.getAvailablePets();
+        return ResponseEntity.ok(pets);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPetById(@PathVariable String id) {
-        try {
-            Optional<Pet> pet = petService.getPetById(id);
-            if (pet.isPresent()) {
-                return ResponseEntity.ok(pet.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+        Optional<Pet> pet = petService.getPetById(id);
+        if (pet.isPresent()) {
+            return ResponseEntity.ok(pet.get());
         }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/species/{species}")
-    public ResponseEntity<?> getPetsBySpecies(@PathVariable String species) {
-        try {
-            List<Pet> pets = petService.getPetsBySpecies(species);
-            return ResponseEntity.ok(pets);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
-        }
+    public ResponseEntity<List<Pet>> getPetsBySpecies(@PathVariable String species) {
+        List<Pet> pets = petService.getPetsBySpecies(species);
+        return ResponseEntity.ok(pets);
     }
 
     @PostMapping
@@ -103,7 +124,6 @@ public class PetController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody PetRequest petRequest) {
         try {
-            // Verificar que la mascota pertenece a la fundación
             Optional<Pet> existingPet = petService.getPetById(id);
             if (existingPet.isEmpty()) {
                 return ResponseEntity.notFound().build();
@@ -115,17 +135,17 @@ public class PetController {
                     .body(new MessageResponse("No tienes permisos para editar esta mascota"));
             }
 
-            Pet pet = new Pet();
-            pet.setName(petRequest.getName());
-            pet.setSpecies(petRequest.getSpecies());
-            pet.setBreed(petRequest.getBreed());
-            pet.setAge(petRequest.getAge());
-            pet.setGender(petRequest.getGender());
-            pet.setSize(petRequest.getSize());
-            pet.setDescription(petRequest.getDescription());
-            pet.setImageUrls(petRequest.getImageUrls());
+            Pet petDetails = new Pet();
+            petDetails.setName(petRequest.getName());
+            petDetails.setSpecies(petRequest.getSpecies());
+            petDetails.setBreed(petRequest.getBreed());
+            petDetails.setAge(petRequest.getAge());
+            petDetails.setGender(petRequest.getGender());
+            petDetails.setSize(petRequest.getSize());
+            petDetails.setDescription(petRequest.getDescription());
+            petDetails.setImageUrls(petRequest.getImageUrls());
 
-            Pet updatedPet = petService.updatePet(id, pet);
+            Pet updatedPet = petService.updatePet(id, petDetails);
             return ResponseEntity.ok(updatedPet);
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -148,7 +168,7 @@ public class PetController {
             if (!existingPet.get().getFoundationId().equals(userPrincipal.getId()) && 
                 !userPrincipal.getAuthorities().toString().contains("ADMIN")) {
                 return ResponseEntity.status(403)
-                    .body(new MessageResponse("No tienes permisos para cambiar el estado de esta mascota"));
+                    .body(new MessageResponse("No tienes permisos para cambiar el estado"));
             }
 
             Pet updatedPet = petService.updatePetStatus(id, status);
@@ -173,11 +193,11 @@ public class PetController {
             if (!existingPet.get().getFoundationId().equals(userPrincipal.getId()) && 
                 !userPrincipal.getAuthorities().toString().contains("ADMIN")) {
                 return ResponseEntity.status(403)
-                    .body(new MessageResponse("No tienes permisos para eliminar esta mascota"));
+                    .body(new MessageResponse("No tienes permisos para eliminar"));
             }
 
             petService.deletePet(id);
-            return ResponseEntity.ok(new MessageResponse("Mascota eliminada exitosamente"));
+            return ResponseEntity.ok(new MessageResponse("Mascota eliminada"));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .body(new MessageResponse("Error: " + e.getMessage()));
@@ -186,30 +206,20 @@ public class PetController {
 
     @GetMapping("/foundation/my-pets")
     @PreAuthorize("hasRole('FOUNDATION')")
-    public ResponseEntity<?> getMyPets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<List<Pet>> getMyPets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        List<Pet> pets = petService.getPetsByFoundation(userPrincipal.getId());
+        return ResponseEntity.ok(pets);
+    }
+
+    @PostMapping("/upload-image")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
+    public ResponseEntity<?> uploadPetImage(@RequestParam("file") MultipartFile file) {
         try {
-            List<Pet> pets = petService.getPetsByFoundation(userPrincipal.getId());
-            return ResponseEntity.ok(pets);
+            String imageUrl = fileUploadService.uploadPetImage(file);
+            return ResponseEntity.ok(new ImageUploadResponse(imageUrl));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .body(new MessageResponse("Error: " + e.getMessage()));
-        }
-    }
-
-    // Clase interna para respuestas de mensaje
-    public static class MessageResponse {
-        private String message;
-
-        public MessageResponse(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
         }
     }
 }

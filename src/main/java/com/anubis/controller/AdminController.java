@@ -1,14 +1,27 @@
 package com.anubis.controller;
 
-import com.anubis.repository.UserRepository;
-import com.anubis.repository.ApplicationRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.anubis.model.User;
+import com.anubis.repository.ApplicationRepository;
+import com.anubis.repository.PetRepository;
+import com.anubis.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = {"http://localhost:3000"})
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     @Autowired
@@ -16,6 +29,62 @@ public class AdminController {
 
     @Autowired
     private ApplicationRepository applicationRepository;
+    
+    @Autowired
+    private PetRepository petRepository;
+
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        try {
+            List<User> users = userRepository.findAll();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
+        try {
+            Optional<User> user = userRepository.findById(userId);
+            if (!user.isPresent()) {
+                return ResponseEntity.status(404).body("Usuario no encontrado");
+            }
+            
+            // Eliminar todas las aplicaciones del usuario
+            applicationRepository.deleteByUserId(userId);
+            
+            // Si es fundación, eliminar sus mascotas
+            if ("FOUNDATION".equals(user.get().getRole().name())) {
+                petRepository.deleteByFoundationId(userId);
+            }
+            
+            // Eliminar el usuario
+            userRepository.deleteById(userId);
+            
+            return ResponseEntity.ok().body("Usuario eliminado exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al eliminar usuario: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<?> getStatistics() {
+        try {
+            long userCount = userRepository.count();
+            long applicationCount = applicationRepository.count();
+            long petCount = petRepository.count();
+            
+            return ResponseEntity.ok().body("""
+                Estadísticas del Sistema:
+                Usuarios: %d
+                Aplicaciones: %d
+                Mascotas: %d
+                """.formatted(userCount, applicationCount, petCount));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al obtener estadísticas: " + e.getMessage());
+        }
+    }
 
     @DeleteMapping("/clear-all-data")
     public ResponseEntity<?> clearAllData() {
@@ -26,9 +95,9 @@ public class AdminController {
             // Borrar todas las aplicaciones  
             applicationRepository.deleteAll();
             
-            return ResponseEntity.ok().body("✅ Todos los datos han sido eliminados exitosamente");
+            return ResponseEntity.ok().body("Todos los datos han sido eliminados exitosamente");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("❌ Error al eliminar datos: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error al eliminar datos: " + e.getMessage());
         }
     }
 
@@ -38,13 +107,13 @@ public class AdminController {
             long userCount = userRepository.count();
             long applicationCount = applicationRepository.count();
             
-            return ResponseEntity.ok().body(
-                "📊 Datos en base:\n" +
-                "👥 Usuarios: " + userCount + "\n" +
-                "📋 Aplicaciones: " + applicationCount
-            );
+            return ResponseEntity.ok().body("""
+                Datos en base:
+                Usuarios: %d
+                Aplicaciones: %d
+                """.formatted(userCount, applicationCount));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("❌ Error al contar datos: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error al contar datos: " + e.getMessage());
         }
     }
 }

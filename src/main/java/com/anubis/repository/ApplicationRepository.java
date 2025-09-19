@@ -1,11 +1,12 @@
 package com.anubis.repository;
 
-import com.anubis.model.Application;
-import com.anubis.model.ApplicationStatus;
+import java.util.List;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.anubis.model.Application;
+import com.anubis.model.ApplicationStatus;
 
 @Repository
 public interface ApplicationRepository extends MongoRepository<Application, String> {
@@ -21,4 +22,6 @@ public interface ApplicationRepository extends MongoRepository<Application, Stri
     List<Application> findByPetIdAndStatus(String petId, ApplicationStatus status);
     
     boolean existsByUserIdAndPetId(String userId, String petId);
+    
+    void deleteByUserId(String userId);
 }

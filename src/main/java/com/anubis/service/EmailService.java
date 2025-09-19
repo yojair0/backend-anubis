@@ -43,12 +43,12 @@ public class EmailService {
             message.setText(text);
             mailSender.send(message);
             
-            System.out.println("✅ CÓDIGO DE VERIFICACIÓN ENVIADO:");
+            System.out.println("CODIGO DE VERIFICACION ENVIADO:");
             System.out.println("Para: " + email);
             System.out.println("Código: " + verificationCode);
             
         } catch (Exception e) {
-            System.err.println("❌ ERROR enviando código de verificación: " + e.getMessage());
+            System.err.println("ERROR enviando código de verificación: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error enviando email de verificación", e);
         }
