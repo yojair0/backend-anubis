@@ -23,11 +23,11 @@ Ver archivo `.env.example` para las variables requeridas.
 **Request:**
 ```json
 {
-  "firstName": "Juan",
-  "lastName": "Pérez",
   "email": "juan@email.com",
   "password": "password123",
-  "phone": "555-1234"
+  "fullName": "Juan Pérez",
+  "phone": "555-1234",
+  "role": "USER"
 }
 ```
 

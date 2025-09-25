@@ -30,7 +30,15 @@ public class Pet {
     
     private PetStatus status;
     
+<<<<<<< Updated upstream
     private String foundationId; // ID de la fundación que publica
+=======
+    // @DBRef
+    // private Foundation foundation; // Referencia a la fundación - TEMPORALMENTE COMENTADO
+    
+    // Mantener foundationId para compatibilidad con código existente
+    private String foundationId;
+>>>>>>> Stashed changes
     
     private LocalDateTime createdAt;
     
@@ -127,6 +135,22 @@ public class Pet {
         this.status = status;
     }
 
+<<<<<<< Updated upstream
+=======
+    // TEMPORALMENTE COMENTADO - Foundation no está implementada
+    /*
+    public Foundation getFoundation() {
+        return foundation;
+    }
+
+    public void setFoundation(Foundation foundation) {
+        this.foundation = foundation;
+        // Mantener sincronización con foundationId para compatibilidad
+        this.foundationId = foundation != null ? foundation.getId() : null;
+    }
+    */
+
+>>>>>>> Stashed changes
     public String getFoundationId() {
         return foundationId;
     }

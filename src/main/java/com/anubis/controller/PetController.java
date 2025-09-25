@@ -23,6 +23,10 @@ import com.anubis.model.Pet;
 import com.anubis.model.PetStatus;
 import com.anubis.security.UserPrincipal;
 import com.anubis.service.PetService;
+<<<<<<< Updated upstream
+=======
+// import com.anubis.service.FileUploadService; // TEMPORALMENTE COMENTADO
+>>>>>>> Stashed changes
 
 import jakarta.validation.Valid;
 
@@ -34,6 +38,44 @@ public class PetController {
     @Autowired
     private PetService petService;
 
+<<<<<<< Updated upstream
+=======
+    // @Autowired
+    // private FileUploadService fileUploadService; // TEMPORALMENTE COMENTADO
+
+    public static class MessageResponse {
+        private String message;
+
+        public MessageResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
+    public static class ImageUploadResponse {
+        private String imageUrl;
+
+        public ImageUploadResponse(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+    }
+
+>>>>>>> Stashed changes
     @GetMapping
     public ResponseEntity<?> getAllPets() {
         try {
@@ -186,7 +228,20 @@ public class PetController {
 
     @GetMapping("/foundation/my-pets")
     @PreAuthorize("hasRole('FOUNDATION')")
+<<<<<<< Updated upstream
     public ResponseEntity<?> getMyPets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+=======
+    public ResponseEntity<List<Pet>> getMyPets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        List<Pet> pets = petService.getPetsByFoundation(userPrincipal.getId());
+        return ResponseEntity.ok(pets);
+    }
+
+    // TEMPORALMENTE COMENTADO - FileUploadService no está implementado
+    /*
+    @PostMapping("/upload-image")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
+    public ResponseEntity<?> uploadPetImage(@RequestParam("file") MultipartFile file) {
+>>>>>>> Stashed changes
         try {
             List<Pet> pets = petService.getPetsByFoundation(userPrincipal.getId());
             return ResponseEntity.ok(pets);
@@ -195,6 +250,7 @@ public class PetController {
                 .body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
+<<<<<<< Updated upstream
 
     // Clase interna para respuestas de mensaje
     public static class MessageResponse {
@@ -212,4 +268,7 @@ public class PetController {
             this.message = message;
         }
     }
+=======
+    */
+>>>>>>> Stashed changes
 }

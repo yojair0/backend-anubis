@@ -111,6 +111,11 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+        return ResponseEntity.ok(new MessageResponse("API funcionando correctamente - " + java.time.LocalDateTime.now()));
+    }
+
     // Clase interna para respuestas de mensaje
     public static class MessageResponse {
         private String message;

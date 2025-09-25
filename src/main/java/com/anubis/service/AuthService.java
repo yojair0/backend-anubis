@@ -77,12 +77,22 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        // Enviar email con código de verificación
-        emailService.sendVerificationCodeEmail(
-            savedUser.getEmail(), 
-            savedUser.getFullName(),
-            verificationCode
-        );
+        // Intentar enviar email con código de verificación
+        try {
+            emailService.sendVerificationCodeEmail(
+                savedUser.getEmail(), 
+                savedUser.getFullName(),
+                verificationCode
+            );
+            System.out.println("✅ Email de verificación enviado correctamente a: " + savedUser.getEmail());
+        } catch (Exception e) {
+            System.err.println("⚠️ No se pudo enviar el email de verificación: " + e.getMessage());
+            System.out.println("📧 CÓDIGO DE VERIFICACIÓN PARA DESARROLLO:");
+            System.out.println("Email: " + savedUser.getEmail());
+            System.out.println("Código: " + verificationCode);
+            System.out.println("Expira: " + user.getVerificationCodeExpiry());
+            // No lanzamos excepción, permitimos que el registro continúe
+        }
 
         // Generar token JWT (usuario puede usar la app pero con email no verificado)
         String jwt = tokenProvider.generateToken(savedUser.getId());

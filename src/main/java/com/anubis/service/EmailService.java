@@ -50,6 +50,7 @@ public class EmailService {
         } catch (Exception e) {
             System.err.println("❌ ERROR enviando código de verificación: " + e.getMessage());
             e.printStackTrace();
+            // En desarrollo, no lanzamos excepción para que el registro pueda continuar
             throw new RuntimeException("Error enviando email de verificación", e);
         }
     }
