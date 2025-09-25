@@ -33,39 +33,22 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
-            AuthResponse response = authService.register(registerRequest);
-            return ResponseEntity.ok(response);
+            String message = authService.register(registerRequest);
+            return ResponseEntity.ok(new MessageResponse(message));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
-    @PostMapping("/verify-code")
-    public ResponseEntity<?> verifyCode(@RequestParam String email, @RequestParam String code) {
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmailWithCode(@RequestParam String email, @RequestParam String code) {
         try {
-            boolean verified = authService.verifyEmailWithCode(email, code);
-            if (verified) {
-                return ResponseEntity.ok(new MessageResponse("Email verificado exitosamente"));
-            } else {
-                return ResponseEntity.badRequest().body(new MessageResponse("Error al verificar código"));
-            }
+            AuthResponse response = authService.verifyEmailWithCode(email, code);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
-        }
-    }
-
-    @GetMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
-        try {
-            boolean verified = authService.verifyEmail(token);
-            if (verified) {
-                return ResponseEntity.ok(new MessageResponse("Email verificado exitosamente"));
-            } else {
-                return ResponseEntity.badRequest().body(new MessageResponse("Error al verificar email"));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest()
+                .body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
@@ -111,7 +94,6 @@ public class AuthController {
         }
     }
 
-    // Clase interna para respuestas de mensaje
     public static class MessageResponse {
         private String message;
 

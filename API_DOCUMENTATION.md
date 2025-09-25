@@ -23,8 +23,7 @@ Ver archivo `.env.example` para las variables requeridas.
 **Request:**
 ```json
 {
-  "firstName": "Juan",
-  "lastName": "Pérez",
+  "fullName": "Juan Pérez",
   "email": "juan@email.com",
   "password": "password123",
   "phone": "555-1234"
@@ -704,27 +703,3 @@ const createApplication = async (applicationData) => {
 };
 ```
 
-## Flujo de Trabajo Recomendado
-
-### Para Usuario Regular:
-1. Registrarse → `POST /api/auth/register`
-2. Verificar email → `POST /api/auth/verify-code`
-3. Ver mascotas disponibles → `GET /api/pets`
-4. Crear postulación → `POST /api/applications/create`
-5. Verificar estado de postulaciones → `GET /api/applications/user/my-applications`
-
-### Para Administrador:
-1. Iniciar sesión → `POST /api/auth/login`
-2. Ver estadísticas → `GET /api/admin/stats`
-3. Gestionar mascotas → `POST/PUT/DELETE /api/pets`
-4. Revisar postulaciones → `GET /api/applications`
-5. Aprobar/rechazar postulaciones → `PUT /api/applications/{id}/status`
-
-## Notas Importantes
-
-- Los endpoints públicos NO requieren autenticación (GET /api/pets)
-- Los códigos de verificación aparecen en la consola del backend durante desarrollo
-- Las imágenes de mascotas son URLs externas (Unsplash)
-- El sistema envía emails reales a través de Mailtrap en desarrollo
-- Todos los IDs son ObjectIds de MongoDB (24 caracteres hexadecimales)
-- Las fechas están en formato ISO 8601 UTC

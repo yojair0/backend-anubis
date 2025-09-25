@@ -1,13 +1,9 @@
 package com.anubis.service;
 
-import com.anubis.dto.AuthResponse;
-import com.anubis.dto.LoginRequest;
-import com.anubis.dto.RegisterRequest;
-import com.anubis.dto.PasswordResetRequest;
-import com.anubis.dto.PasswordResetConfirmRequest;
-import com.anubis.model.User;
-import com.anubis.repository.UserRepository;
-import com.anubis.security.JwtTokenProvider;
+import java.time.LocalDateTime;
+import java.util.Random;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,9 +12,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-import java.util.Random;
+import com.anubis.dto.AuthResponse;
+import com.anubis.dto.LoginRequest;
+import com.anubis.dto.RegisterRequest;
+import com.anubis.model.PendingRegistration;
+import com.anubis.model.Role;
+import com.anubis.model.User;
+import com.anubis.repository.PendingRegistrationRepository;
+import com.anubis.repository.UserRepository;
+import com.anubis.security.JwtTokenProvider;
 
 @Service
 public class AuthService {
@@ -38,6 +40,9 @@ public class AuthService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private PendingRegistrationRepository pendingRegistrationRepository;
+
     public AuthResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
@@ -56,59 +61,75 @@ public class AuthService {
         return new AuthResponse(jwt, user.getId(), user.getEmail(), user.getFullName(), user.getRole());
     }
 
-    public AuthResponse register(RegisterRequest registerRequest) {
+    public String register(RegisterRequest registerRequest) {
         // Verificar si el usuario ya existe
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        // Crear nuevo usuario
-        User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setFullName(registerRequest.getFullName());
-        user.setPhone(registerRequest.getPhone());
-        user.setRole(registerRequest.getRole());
+        // Verificar si ya hay un registro pendiente
+        if (pendingRegistrationRepository.existsByEmail(registerRequest.getEmail())) {
+            // Eliminar el registro pendiente anterior
+            pendingRegistrationRepository.deleteByEmail(registerRequest.getEmail());
+        }
+
+        // Crear registro pendiente (NO usuario final)
+        PendingRegistration pendingRegistration = new PendingRegistration();
+        pendingRegistration.setEmail(registerRequest.getEmail());
+        pendingRegistration.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        pendingRegistration.setFullName(registerRequest.getFullName());
+        pendingRegistration.setPhone(registerRequest.getPhone());
+        pendingRegistration.setRole(Role.USER); // Siempre asignar rol USER automáticamente
         
         // Generar código de verificación de 6 dígitos
         String verificationCode = String.format("%06d", new Random().nextInt(999999));
-        user.setVerificationCode(verificationCode);
-        user.setVerificationCodeExpiry(LocalDateTime.now().plusMinutes(15));
+        pendingRegistration.setVerificationCode(verificationCode);
+        pendingRegistration.setVerificationCodeExpiry(LocalDateTime.now().plusMinutes(15));
 
-        User savedUser = userRepository.save(user);
+        pendingRegistrationRepository.save(pendingRegistration);
 
         // Enviar email con código de verificación
         emailService.sendVerificationCodeEmail(
-            savedUser.getEmail(), 
-            savedUser.getFullName(),
+            pendingRegistration.getEmail(), 
+            pendingRegistration.getFullName(),
             verificationCode
         );
 
-        // Generar token JWT (usuario puede usar la app pero con email no verificado)
+        return "Código de verificación enviado. Revisa tu email.";
+    }
+
+    public AuthResponse verifyEmailWithCode(String email, String code) {
+        // Buscar en registros pendientes
+        PendingRegistration pendingRegistration = pendingRegistrationRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("No se encontró registro pendiente"));
+
+        if (pendingRegistration.getVerificationCode() == null || !pendingRegistration.getVerificationCode().equals(code)) {
+            throw new RuntimeException("Código de verificación inválido");
+        }
+
+        if (pendingRegistration.getVerificationCodeExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Código de verificación expirado");
+        }
+
+        // AHORA SI: Crear usuario real en la base de datos
+        User user = new User();
+        user.setEmail(pendingRegistration.getEmail());
+        user.setPassword(pendingRegistration.getPassword()); // Ya está encriptada
+        user.setFullName(pendingRegistration.getFullName());
+        user.setPhone(pendingRegistration.getPhone());
+        user.setRole(pendingRegistration.getRole());
+        user.setEmailVerified(true); // Ya verificado
+
+        User savedUser = userRepository.save(user);
+
+        // Eliminar registro pendiente
+        pendingRegistrationRepository.deleteByEmail(email);
+
+        // Generar token JWT
         String jwt = tokenProvider.generateToken(savedUser.getId());
 
         return new AuthResponse(jwt, savedUser.getId(), savedUser.getEmail(), 
                               savedUser.getFullName(), savedUser.getRole());
-    }
-
-    public boolean verifyEmailWithCode(String email, String code) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        if (user.getVerificationCode() == null || !user.getVerificationCode().equals(code)) {
-            throw new RuntimeException("Código de verificación inválido");
-        }
-
-        if (user.getVerificationCodeExpiry().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Código de verificación expirado");
-        }
-
-        user.setEmailVerified(true);
-        user.setVerificationCode(null);
-        user.setVerificationCodeExpiry(null);
-        userRepository.save(user);
-
-        return true;
     }
 
     public boolean verifyEmail(String token) {

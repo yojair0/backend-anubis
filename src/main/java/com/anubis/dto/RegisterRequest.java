@@ -1,9 +1,7 @@
 package com.anubis.dto;
 
-import com.anubis.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
@@ -21,19 +19,15 @@ public class RegisterRequest {
     
     @NotBlank(message = "Teléfono es requerido")
     private String phone;
-    
-    @NotNull(message = "Rol es requerido")
-    private Role role;
 
     // Constructores
     public RegisterRequest() {}
 
-    public RegisterRequest(String email, String password, String fullName, String phone, Role role) {
+    public RegisterRequest(String email, String password, String fullName, String phone) {
         this.email = email;
         this.password = password;
         this.fullName = fullName;
         this.phone = phone;
-        this.role = role;
     }
 
     // Getters y Setters
@@ -67,13 +61,5 @@ public class RegisterRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 }
