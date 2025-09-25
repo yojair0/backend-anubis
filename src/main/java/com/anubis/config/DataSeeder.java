@@ -12,6 +12,7 @@ import com.anubis.model.Pet;
 import com.anubis.model.PetStatus;
 import com.anubis.repository.PetRepository;
 
+/*
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -75,3 +76,4 @@ public class DataSeeder implements CommandLineRunner {
         return pet;
     }
 }
+*/
