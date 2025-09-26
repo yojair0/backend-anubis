@@ -51,15 +51,12 @@ public class AdminController {
                 return ResponseEntity.status(404).body("Usuario no encontrado");
             }
             
-            // Eliminar todas las aplicaciones del usuario
             applicationRepository.deleteByUserId(userId);
             
-            // Si es fundación, eliminar sus mascotas
             if ("FOUNDATION".equals(user.get().getRole().name())) {
                 petRepository.deleteByFoundationId(userId);
             }
             
-            // Eliminar el usuario
             userRepository.deleteById(userId);
             
             return ResponseEntity.ok().body("Usuario eliminado exitosamente");
@@ -76,9 +73,9 @@ public class AdminController {
             long petCount = petRepository.count();
             
             return ResponseEntity.ok().body("""
-                Estadísticas del Sistema:
+                Estadísticas del sistema:
                 Usuarios: %d
-                Aplicaciones: %d
+                Postulaciones: %d
                 Mascotas: %d
                 """.formatted(userCount, applicationCount, petCount));
         } catch (Exception e) {
@@ -89,10 +86,7 @@ public class AdminController {
     @DeleteMapping("/clear-all-data")
     public ResponseEntity<?> clearAllData() {
         try {
-            // Borrar todos los usuarios
             userRepository.deleteAll();
-            
-            // Borrar todas las aplicaciones  
             applicationRepository.deleteAll();
             
             return ResponseEntity.ok().body("Todos los datos han sido eliminados exitosamente");
@@ -110,7 +104,7 @@ public class AdminController {
             return ResponseEntity.ok().body("""
                 Datos en base:
                 Usuarios: %d
-                Aplicaciones: %d
+                Postulaciones: %d
                 """.formatted(userCount, applicationCount));
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al contar datos: " + e.getMessage());

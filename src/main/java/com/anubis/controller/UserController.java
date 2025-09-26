@@ -27,7 +27,6 @@ public class UserController {
             User user = userService.getUserById(userPrincipal.getId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             
-            // No devolver la contraseña
             user.setPassword(null);
             
             return ResponseEntity.ok(user);
@@ -44,7 +43,7 @@ public class UserController {
             @RequestBody User updatedUser) {
         try {
             User user = userService.updateUserProfile(userPrincipal.getId(), updatedUser);
-            user.setPassword(null); // No devolver la contraseña
+            user.setPassword(null);
             
             return ResponseEntity.ok(user);
         } catch (Exception e) {
@@ -57,7 +56,6 @@ public class UserController {
     public ResponseEntity<?> getFoundations() {
         try {
             List<User> foundations = userService.getUsersByRole(Role.FOUNDATION);
-            // No devolver contraseñas
             foundations.forEach(foundation -> foundation.setPassword(null));
             
             return ResponseEntity.ok(foundations);
@@ -84,7 +82,6 @@ public class UserController {
     public ResponseEntity<?> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
-            // No devolver contraseñas
             users.forEach(user -> user.setPassword(null));
             
             return ResponseEntity.ok(users);
@@ -94,7 +91,6 @@ public class UserController {
         }
     }
 
-    // Clase interna para respuestas de mensaje
     public static class MessageResponse {
         private String message;
 

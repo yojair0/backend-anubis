@@ -30,25 +30,25 @@ public class EmailService {
             
             String text = String.format(
                 "Hola %s,\n\n" +
-                "¡Bienvenido a %s!\n\n" +
+                "¡Bienvenido/a a %s!\n\n" +
                 "Tu código de verificación es:\n\n" +
-                "🔑 %s\n\n" +
+                " %s\n\n" +
                 "Este código expira en 15 minutos.\n\n" +
                 "Si no creaste esta cuenta, puedes ignorar este email.\n\n" +
                 "¡Gracias por unirte a nuestra comunidad!\n\n" +
-                "El equipo de %s",
+                "El equipo de %s .",
                 fullName, appName, verificationCode, appName
             );
             
             message.setText(text);
             mailSender.send(message);
             
-            System.out.println("CODIGO DE VERIFICACION ENVIADO:");
+            System.out.println("Código de verificación enviado:");
             System.out.println("Para: " + email);
             System.out.println("Código: " + verificationCode);
             
         } catch (Exception e) {
-            System.err.println("ERROR enviando código de verificación: " + e.getMessage());
+            System.err.println("Error enviando código de verificación: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error enviando email de verificación", e);
         }
@@ -69,20 +69,20 @@ public class EmailService {
                 "%s\n\n" +
                 "Si no creaste esta cuenta, puedes ignorar este email.\n\n" +
                 "¡Gracias por unirte a nuestra comunidad!\n\n" +
-                "El equipo de %s",
+                "El equipo de %s .",
                 fullName, appName, verificationUrl, appName
             );
             
             message.setText(text);
             mailSender.send(message);
             
-            System.out.println("✅ EMAIL DE VERIFICACIÓN ENVIADO:");
+            System.out.println("Email de verificación enviado:");
             System.out.println("Para: " + email);
             System.out.println("URL: " + verificationUrl);
             System.out.println("Token: " + verificationToken);
             
         } catch (Exception e) {
-            System.err.println("❌ ERROR ENVIANDO EMAIL: " + e.getMessage());
+            System.err.println("Error enviando email de verificación: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -107,7 +107,7 @@ public class EmailService {
                 "%s\n\n" +
                 "Puedes revisar el estado de todas tus postulaciones en tu panel de usuario.\n\n" +
                 "¡Gracias por ser parte de nuestra comunidad!\n\n" +
-                "El equipo de %s",
+                "El equipo de %s .",
                 fullName, statusText, 
                 (foundationResponse != null && !foundationResponse.trim().isEmpty()) ? 
                     "Mensaje de la fundación: " + foundationResponse : "",
@@ -118,12 +118,12 @@ public class EmailService {
             message.setText(text);
             mailSender.send(message);
             
-            System.out.println("✅ NOTIFICACIÓN ENVIADA:");
+            System.out.println("Notificación enviada:");
             System.out.println("Para: " + email);
             System.out.println("Estado: " + status);
             
         } catch (Exception e) {
-            System.err.println("❌ ERROR ENVIANDO NOTIFICACIÓN: " + e.getMessage());
+            System.err.println("Error enviando notificación: " + e.getMessage());
         }
     }
 
@@ -142,19 +142,19 @@ public class EmailService {
                 "%s\n\n" +
                 "Este enlace expirará en 1 hora por seguridad.\n\n" +
                 "Si no solicitaste un restablecimiento de contraseña, puedes ignorar este email.\n\n" +
-                "El equipo de %s",
+                "El equipo de %s .",
                 fullName, appName, resetUrl, appName
             );
             
             message.setText(text);
             mailSender.send(message);
             
-            System.out.println("✅ EMAIL DE RESET ENVIADO:");
+            System.out.println("Email de reset enviado:");
             System.out.println("Para: " + email);
             System.out.println("URL: " + resetUrl);
             
         } catch (Exception e) {
-            System.err.println("❌ ERROR ENVIANDO RESET: " + e.getMessage());
+            System.err.println("Error enviando email de reset: " + e.getMessage());
         }
     }
 }

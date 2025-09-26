@@ -1,4 +1,4 @@
-# API Backend Anubis - Documentación para Frontend
+# API Backend Anubis - Documentación
 
 ## URL Base
 ```
@@ -14,6 +14,7 @@ Ver archivo `.env.example` para las variables requeridas.
 ```bash
 ./mvnw.cmd spring-boot:run
 ```
+
 
 ## Autenticación
 
@@ -33,15 +34,82 @@ Ver archivo `.env.example` para las variables requeridas.
 **Response Exitoso:**
 ```json
 {
-  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.example",
-  "type": "Bearer",
-  "id": "66de123456789abcdef01234",
-  "firstName": "Juan",
-  "lastName": "Pérez",
+  "message": "Código de verificación enviado. Revisa tu email."
+}
+```
+
+### 2. Verificar Email con Código
+**POST** `/api/auth/verify-email`
+
+**Request:**
+```json
+{
   "email": "juan@email.com",
-  "phone": "555-1234",
-  "roles": ["ROLE_USER"],
-  "emailVerified": false
+  "code": "123456"
+}
+```
+
+**Response Exitoso:**
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9...",
+  "id": "66de123456789abcdef01234",
+  "email": "juan@email.com",
+  "fullName": "Juan Pérez",
+  "role": "USER"
+}
+```
+
+### 3. Iniciar Sesión
+**POST** `/api/auth/login`
+
+**Request:**
+```json
+{
+  "email": "juan@email.com",
+  "password": "password123"
+}
+```
+
+**Response Exitoso:**
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9...",
+  "id": "66de123456789abcdef01234",
+  "email": "juan@email.com",
+  "fullName": "Juan Pérez",
+  "role": "USER"
+}
+```
+
+### 4. Reenviar Código de Verificación
+**POST** `/api/auth/resend-verification?email=juan@email.com`
+
+**Response:**
+```json
+{
+  "message": "Email de verificación enviado"
+}
+```
+
+### 5. Solicitar Restablecimiento de Contraseña
+**POST** `/api/auth/forgot-password`
+
+**Request:**
+```json
+{
+  "email": "juan@email.com"
+}
+```
+
+### 6. Restablecer Contraseña
+**POST** `/api/auth/reset-password`
+
+**Request:**
+```json
+{
+  "token": "reset-token-received-by-email",
+  "newPassword": "newPassword123"
 }
 ```
 
@@ -66,7 +134,15 @@ Ver archivo `.env.example` para las variables requeridas.
 **Response:** Mismo formato que registro
 
 ### 3. Verificar Email
-**POST** `/api/auth/verify-code?email=juan@email.com&code=123456`
+**POST** `/api/auth/verify-email`
+
+**Request:**
+```json
+{
+  "email": "juan@email.com",
+  "code": "111111"
+}
+```
 
 **Response Exitoso:**
 ```json
@@ -154,7 +230,7 @@ Ver archivo `.env.example` para las variables requeridas.
 }
 ```
 
-### 3. Crear Mascota (Solo Administrador)
+### 3. Crear Mascota (Administrador y Fundación)
 **POST** `/api/pets`
 
 **Headers:**
@@ -175,7 +251,7 @@ Content-Type: application/json
 }
 ```
 
-### 4. Actualizar Mascota (Solo Administrador)
+### 4. Actualizar Mascota (Administrador y Fundación)
 **PUT** `/api/pets/{id}`
 
 **Headers:**
@@ -186,7 +262,7 @@ Content-Type: application/json
 
 **Request:** Mismo formato que crear
 
-### 5. Cambiar Estado de Mascota (Solo Administrador)
+### 5. Cambiar Estado de Mascota (Administrador y Fundación)
 **PUT** `/api/pets/{id}/status`
 
 **Headers:**
@@ -214,7 +290,7 @@ Authorization: Bearer {token}
 
 ## Postulaciones de Adopción
 
-### 1. Crear Postulación
+### 1. Crear Postulación (Usuario)
 **POST** `/api/applications/create`
 
 **Headers:**
@@ -298,7 +374,7 @@ Content-Type: application/json
 ```json
 {
   "status": "APPROVED",
-  "adminNotes": "Postulación aprobada tras entrevista satisfactoria"
+  "adminNotes": "Postulación aprobada"
 }
 ```
 
@@ -391,14 +467,14 @@ Authorization: Bearer {token}
 **Response Exitoso:**
 ```json
 {
-  "message": "✅ Usuario eliminado exitosamente"
+  "message": "Usuario eliminado exitosamente"
 }
 ```
 
 **Response Error:**
 ```json
 {
-  "message": "❌ Usuario no encontrado"
+  "message": "Usuario no encontrado"
 }
 ```
 
@@ -413,7 +489,7 @@ Authorization: Bearer {token}
 **Response:**
 ```json
 {
-  "message": "📊 Estadísticas del Sistema:\n👥 Usuarios: 150\n📋 Aplicaciones: 75\n🐕 Mascotas: 25\n"
+  "message": "Estadísticas del Sistema:\n Usuarios: 150\n Postulaciones: 75\n Mascotas: 25\n"
 }
 ```
 
@@ -428,11 +504,11 @@ Authorization: Bearer {token}
 **Response:**
 ```json
 {
-  "message": "📊 Datos en base:\n👥 Usuarios: 150\n📋 Aplicaciones: 75\n"
+  "message": "Datos en base:\n Usuarios: 150\n Postulaciones: 75\n"
 }
 ```
 
-### 5. Limpiar Todos los Datos (Solo Administrador - ⚠️ PELIGROSO)
+### 5. Limpiar Todos los Datos (Solo Administrador)
 **DELETE** `/api/admin/clear-all-data`
 
 **Headers:**
@@ -443,11 +519,11 @@ Authorization: Bearer {token}
 **Response:**
 ```json
 {
-  "message": "✅ Todos los datos han sido eliminados exitosamente"
+  "message": "Todos los datos han sido eliminados exitosamente"
 }
 ```
 
-### 6. Estadísticas del Sistema (Solo Administrador) - LEGACY
+### 6. Estadísticas del Sistema (Solo Administrador)
 **GET** `/api/admin/stats`
 
 **Headers:**
@@ -537,7 +613,7 @@ El backend acepta requests desde:
 
 ### Endpoints de Login - Casos de Prueba
 
-#### ✅ 1. Login Usuario Exitoso
+#### 1. Login Usuario Exitoso
 ```bash
 curl -X POST http://localhost:8081/api/auth/login \
   -H "Content-Type: application/json" \
@@ -548,7 +624,7 @@ curl -X POST http://localhost:8081/api/auth/login \
 ```
 **Esperado**: Token JWT + datos usuario
 
-#### ✅ 2. Login con Credenciales Incorrectas
+#### 2. Login con Credenciales Incorrectas
 ```bash
 curl -X POST http://localhost:8081/api/auth/login \
   -H "Content-Type: application/json" \
@@ -559,7 +635,7 @@ curl -X POST http://localhost:8081/api/auth/login \
 ```
 **Esperado**: Error 401
 
-#### ✅ 3. Register Usuario
+#### 3. Registrar Usuario
 ```bash
 curl -X POST http://localhost:8081/api/auth/register \
   -H "Content-Type: application/json" \
@@ -575,7 +651,7 @@ curl -X POST http://localhost:8081/api/auth/register \
 
 ### Endpoints de Postulaciones - Casos de Prueba
 
-#### ✅ 4. Crear Postulación
+#### 4. Crear Postulación (Usuario)
 ```bash
 curl -X POST http://localhost:8081/api/applications/create \
   -H "Authorization: Bearer {token}" \
@@ -588,13 +664,13 @@ curl -X POST http://localhost:8081/api/applications/create \
   }'
 ```
 
-#### ✅ 5. Mis Postulaciones
+#### 5. Mis Postulaciones (Usuario)
 ```bash
 curl -X GET http://localhost:8081/api/applications/user/my-applications \
   -H "Authorization: Bearer {token}"
 ```
 
-#### ✅ 6. Cambiar Estado Postulación (Admin)
+#### 6. Cambiar Estado Postulación (Admin y Fundación)
 ```bash
 curl -X PUT http://localhost:8081/api/applications/{id}/status \
   -H "Authorization: Bearer {admin-token}" \
@@ -607,13 +683,13 @@ curl -X PUT http://localhost:8081/api/applications/{id}/status \
 
 ### Endpoints de Administración - Casos de Prueba
 
-#### ✅ 7. Eliminar Usuario (Admin)
+#### 7. Eliminar Usuario (Admin)
 ```bash
 curl -X DELETE http://localhost:8081/api/admin/users/{userId} \
   -H "Authorization: Bearer {admin-token}"
 ```
 
-#### ✅ 8. Estadísticas del Sistema
+#### 8. Estadísticas del Sistema (Admin)
 ```bash
 curl -X GET http://localhost:8081/api/admin/statistics \
   -H "Authorization: Bearer {admin-token}"

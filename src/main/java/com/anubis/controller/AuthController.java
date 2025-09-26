@@ -5,6 +5,7 @@ import com.anubis.dto.LoginRequest;
 import com.anubis.dto.RegisterRequest;
 import com.anubis.dto.PasswordResetRequest;
 import com.anubis.dto.PasswordResetConfirmRequest;
+import com.anubis.dto.VerifyEmailRequest;
 import com.anubis.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,9 @@ public class AuthController {
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<?> verifyEmailWithCode(@RequestParam String email, @RequestParam String code) {
+    public ResponseEntity<?> verifyEmailWithCode(@Valid @RequestBody VerifyEmailRequest request) {
         try {
-            AuthResponse response = authService.verifyEmailWithCode(email, code);
+            AuthResponse response = authService.verifyEmailWithCode(request.getEmail(), request.getCode());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest()

@@ -31,8 +31,7 @@ public class ApplicationController {
             Application application = applicationService.createApplication(userPrincipal.getId(), request);
             return ResponseEntity.ok(application);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
@@ -43,19 +42,18 @@ public class ApplicationController {
             List<Application> applications = applicationService.getApplicationsByUser(userPrincipal.getId());
             return ResponseEntity.ok(applications);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
     @GetMapping("/pet/{petId}")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
     public ResponseEntity<?> getApplicationsByPet(@PathVariable String petId) {
         try {
             List<Application> applications = applicationService.getApplicationsByPet(petId);
             return ResponseEntity.ok(applications);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
@@ -66,8 +64,7 @@ public class ApplicationController {
             List<Application> applications = applicationService.getApplicationsByFoundation(userPrincipal.getId());
             return ResponseEntity.ok(applications);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
@@ -82,11 +79,11 @@ public class ApplicationController {
                 applicationId, userPrincipal.getId(), request);
             return ResponseEntity.ok(application);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
+    //revisar!!!!!!
     @GetMapping("/{applicationId}")
     public ResponseEntity<?> getApplicationById(@PathVariable String applicationId) {
         try {
@@ -94,8 +91,7 @@ public class ApplicationController {
                 .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
             return ResponseEntity.ok(application);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
@@ -103,15 +99,12 @@ public class ApplicationController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllApplications() {
         try {
-            // Aquí podrías implementar paginación si es necesario
             return ResponseEntity.ok(new MessageResponse("Endpoint disponible para administradores"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
 
-    // Clase interna para respuestas de mensaje
     public static class MessageResponse {
         private String message;
 
