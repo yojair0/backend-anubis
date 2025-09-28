@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class ApplicationRequest {
     
-    @NotBlank(message = "Pet ID es requerido")
+    @NotBlank(message = "El ID de la mascota es requerido")
     private String petId;
     
     @NotBlank(message = "Mensaje es requerido")
