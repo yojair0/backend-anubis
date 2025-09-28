@@ -406,7 +406,36 @@ Authorization: Bearer {token}
 }
 ```
 
-### 2. Actualizar Mi Perfil
+### 2. Obtener Mi Rol
+**GET** `/api/users/role`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "role": "USER"
+}
+```
+
+**Roles posibles:** `USER`, `FOUNDATION`, `ADMIN`
+
+**Ejemplo de uso:**
+```javascript
+const getUserRole = async () => {
+  const token = localStorage.getItem('token');
+  const response = await fetch('http://localhost:8081/api/users/role', {
+    headers: {'Authorization': `Bearer ${token}`}
+  });
+  const data = await response.json();
+  return data.role; // "USER", "FOUNDATION", o "ADMIN"
+};
+```
+
+### 3. Actualizar Mi Perfil
 **PUT** `/api/users/profile`
 
 **Headers:**
@@ -424,7 +453,7 @@ Content-Type: application/json
 }
 ```
 
-### 3. Listar Todos los Usuarios (Solo Administrador)
+### 4. Listar Todos los Usuarios (Solo Administrador)
 **GET** `/api/users`
 
 **Headers:**

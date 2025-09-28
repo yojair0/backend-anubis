@@ -91,6 +91,36 @@ public class UserController {
         }
     }
 
+    @GetMapping("/role")
+    @PreAuthorize("hasRole('USER') or hasRole('FOUNDATION') or hasRole('ADMIN')")
+    public ResponseEntity<?> getCurrentUserRole(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        try {
+            User user = userService.getUserById(userPrincipal.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+            return ResponseEntity.ok(new RoleResponse(user.getRole()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponse("Error: " + e.getMessage()));
+        }
+    }
+
+    public static class RoleResponse {
+        private Role role;
+
+        public RoleResponse(Role role) {
+            this.role = role;
+        }
+
+        public Role getRole() {
+            return role;
+        }
+
+        public void setRole(Role role) {
+            this.role = role;
+        }
+    }
+
     public static class MessageResponse {
         private String message;
 
