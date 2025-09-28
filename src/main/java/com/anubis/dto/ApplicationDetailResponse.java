@@ -15,18 +15,22 @@ public class ApplicationDetailResponse {
     private String petName;
     private String petSpecies;
     private String petBreed;
-    private String message;
+    private String reason;
+    private String experience;
+    private String livingSpace;
+    private boolean hasOtherPets;
+    private String workSchedule;
     private ApplicationStatus status;
     private String foundationResponse;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Constructores
     public ApplicationDetailResponse() {}
 
     public ApplicationDetailResponse(String id, String userId, String userFullName, String userEmail, 
                                    String userPhone, String petId, String petName, String petSpecies, 
-                                   String petBreed, String message, ApplicationStatus status, 
+                                   String petBreed, String reason, String experience, String livingSpace,
+                                   boolean hasOtherPets, String workSchedule, ApplicationStatus status, 
                                    String foundationResponse, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.userId = userId;
@@ -37,21 +41,28 @@ public class ApplicationDetailResponse {
         this.petName = petName;
         this.petSpecies = petSpecies;
         this.petBreed = petBreed;
-        this.message = message;
+        this.reason = reason;
+        this.experience = experience;
+        this.livingSpace = livingSpace;
+        this.hasOtherPets = hasOtherPets;
+        this.workSchedule = workSchedule;
         this.status = status;
         this.foundationResponse = foundationResponse;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // Constructor que toma objetos Application, Pet y User
     public ApplicationDetailResponse(com.anubis.model.Application application, 
                                    com.anubis.model.Pet pet, 
                                    com.anubis.model.User user) {
         this.id = application.getId();
         this.userId = application.getUserId();
         this.petId = application.getPetId();
-        this.message = application.getMessage();
+        this.reason = application.getReason();
+        this.experience = application.getExperience();
+        this.livingSpace = application.getLivingSpace();
+        this.hasOtherPets = application.isHasOtherPets();
+        this.workSchedule = application.getWorkSchedule();
         this.status = application.getStatus();
         this.foundationResponse = application.getFoundationResponse();
         this.createdAt = application.getCreatedAt();
@@ -70,7 +81,6 @@ public class ApplicationDetailResponse {
         }
     }
 
-    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -143,12 +153,44 @@ public class ApplicationDetailResponse {
         this.petBreed = petBreed;
     }
 
-    public String getMessage() {
-        return message;
+    public String getReason() {
+        return reason;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+
+    public String getLivingSpace() {
+        return livingSpace;
+    }
+
+    public void setLivingSpace(String livingSpace) {
+        this.livingSpace = livingSpace;
+    }
+
+    public boolean isHasOtherPets() {
+        return hasOtherPets;
+    }
+
+    public void setHasOtherPets(boolean hasOtherPets) {
+        this.hasOtherPets = hasOtherPets;
+    }
+
+    public String getWorkSchedule() {
+        return workSchedule;
+    }
+
+    public void setWorkSchedule(String workSchedule) {
+        this.workSchedule = workSchedule;
     }
 
     public ApplicationStatus getStatus() {
@@ -195,7 +237,11 @@ public class ApplicationDetailResponse {
                 ", petName='" + petName + '\'' +
                 ", petSpecies='" + petSpecies + '\'' +
                 ", petBreed='" + petBreed + '\'' +
-                ", message='" + message + '\'' +
+                ", reason='" + reason + '\'' +
+                ", experience='" + experience + '\'' +
+                ", livingSpace='" + livingSpace + '\'' +
+                ", hasOtherPets=" + hasOtherPets +
+                ", workSchedule='" + workSchedule + '\'' +
                 ", status=" + status +
                 ", foundationResponse='" + foundationResponse + '\'' +
                 ", createdAt=" + createdAt +

@@ -348,7 +348,9 @@ Authorization: Bearer {token}
     "hasOtherPets": true,
     "workSchedule": "Trabajo medio tiempo desde casa",
     "status": "PENDING",
-    "createdAt": "2025-09-08T15:30:00.000Z"
+    "foundationResponse": null,
+    "createdAt": "2025-09-08T15:30:00.000Z",
+    "updatedAt": "2025-09-08T15:30:00.000Z"
   }
 ]
 ```
@@ -508,7 +510,76 @@ Authorization: Bearer {token}
 }
 ```
 
-### 5. Limpiar Todos los Datos (Solo Administrador)
+### 5. Crear Usuario con Rol Específico (Solo Administrador)
+**POST** `/api/admin/create-user`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "email": "fundacion@email.com",
+  "password": "password123",
+  "fullName": "Fundación Amor Animal",
+  "phone": "555-9999",
+  "role": "FOUNDATION"
+}
+```
+
+**Roles válidos:** `USER`, `FOUNDATION`, `ADMIN`
+
+**Response Exitoso:**
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9...",
+  "id": "66de123456789abcdef01238",
+  "email": "fundacion@email.com",
+  "fullName": "Fundación Amor Animal",
+  "role": "FOUNDATION"
+}
+```
+
+**⚠️ Nota de Seguridad:** Este endpoint crea usuarios sin verificación de email. Los usuarios creados por admin están pre-verificados.
+
+### 6. Cambiar Rol de Usuario (Solo Administrador)
+**PUT** `/api/admin/users/{userId}/role`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Ejemplo:** `PUT /api/admin/users/66de123456789abcdef01234/role`
+
+**Request:**
+```json
+{
+  "role": "FOUNDATION"
+}
+```
+
+**Roles válidos:** `USER`, `FOUNDATION`, `ADMIN`
+
+**Response Exitoso:**
+```json
+{
+  "message": "Rol actualizado exitosamente. Usuario: juan@email.com ahora tiene rol: FOUNDATION"
+}
+```
+
+**Response Error:**
+```json
+{
+  "message": "Usuario no encontrado"
+}
+```
+
+### 7. Limpiar Todos los Datos (Solo Administrador)
 **DELETE** `/api/admin/clear-all-data`
 
 **Headers:**

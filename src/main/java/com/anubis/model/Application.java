@@ -11,11 +11,19 @@ public class Application {
     @Id
     private String id;
     
-    private String userId; // ID del usuario que postula
+    private String userId;
     
-    private String petId; // ID de la mascota
+    private String petId;
     
-    private String message; // Mensaje de la postulación
+    private String reason;
+    
+    private String experience;
+    
+    private String livingSpace;
+    
+    private boolean hasOtherPets;
+    
+    private String workSchedule;
     
     private ApplicationStatus status;
     
@@ -23,23 +31,26 @@ public class Application {
     
     private LocalDateTime updatedAt;
     
-    private String foundationResponse; // Respuesta opcional de la fundación
+    private String foundationResponse;
 
-    // Constructores
     public Application() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.status = ApplicationStatus.PENDING;
     }
 
-    public Application(String userId, String petId, String message) {
+    public Application(String userId, String petId, String reason, String experience, 
+                      String livingSpace, boolean hasOtherPets, String workSchedule) {
         this();
         this.userId = userId;
         this.petId = petId;
-        this.message = message;
+        this.reason = reason;
+        this.experience = experience;
+        this.livingSpace = livingSpace;
+        this.hasOtherPets = hasOtherPets;
+        this.workSchedule = workSchedule;
     }
 
-    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -64,12 +75,44 @@ public class Application {
         this.petId = petId;
     }
 
-    public String getMessage() {
-        return message;
+    public String getReason() {
+        return reason;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+
+    public String getLivingSpace() {
+        return livingSpace;
+    }
+
+    public void setLivingSpace(String livingSpace) {
+        this.livingSpace = livingSpace;
+    }
+
+    public boolean isHasOtherPets() {
+        return hasOtherPets;
+    }
+
+    public void setHasOtherPets(boolean hasOtherPets) {
+        this.hasOtherPets = hasOtherPets;
+    }
+
+    public String getWorkSchedule() {
+        return workSchedule;
+    }
+
+    public void setWorkSchedule(String workSchedule) {
+        this.workSchedule = workSchedule;
     }
 
     public ApplicationStatus getStatus() {
@@ -111,7 +154,11 @@ public class Application {
                 "id='" + id + '\'' +
                 ", userId='" + userId + '\'' +
                 ", petId='" + petId + '\'' +
-                ", message='" + message + '\'' +
+                ", reason='" + reason + '\'' +
+                ", experience='" + experience + '\'' +
+                ", livingSpace='" + livingSpace + '\'' +
+                ", hasOtherPets=" + hasOtherPets +
+                ", workSchedule='" + workSchedule + '\'' +
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 '}';

@@ -10,13 +10,21 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
+import com.anubis.dto.AdminRegisterRequest;
+import com.anubis.dto.AuthResponse;
+import com.anubis.dto.ChangeRoleRequest;
 import com.anubis.model.User;
 import com.anubis.repository.ApplicationRepository;
 import com.anubis.repository.PetRepository;
 import com.anubis.repository.UserRepository;
+import com.anubis.service.AuthService;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -32,6 +40,9 @@ public class AdminController {
     
     @Autowired
     private PetRepository petRepository;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -108,6 +119,47 @@ public class AdminController {
                 """.formatted(userCount, applicationCount));
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al contar datos: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/create-user")
+    public ResponseEntity<?> createUserWithRole(@Valid @RequestBody AdminRegisterRequest adminRegisterRequest) {
+        try {
+            AuthResponse response = authService.adminRegister(adminRegisterRequest);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponse("Error: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/users/{userId}/role")
+    public ResponseEntity<?> changeUserRole(@PathVariable String userId, 
+                                           @Valid @RequestBody ChangeRoleRequest roleRequest) {
+        try {
+            User updatedUser = authService.changeUserRole(userId, roleRequest.getRole());
+            return ResponseEntity.ok(new MessageResponse(
+                "Rol actualizado exitosamente. Usuario: " + updatedUser.getEmail() + 
+                " ahora tiene rol: " + updatedUser.getRole()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponse("Error: " + e.getMessage()));
+        }
+    }
+
+    public static class MessageResponse {
+        private String message;
+
+        public MessageResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
         }
     }
 }

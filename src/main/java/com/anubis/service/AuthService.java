@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.anubis.dto.AuthResponse;
 import com.anubis.dto.LoginRequest;
 import com.anubis.dto.RegisterRequest;
+import com.anubis.dto.AdminRegisterRequest;
 import com.anubis.model.PendingRegistration;
 import com.anubis.model.Role;
 import com.anubis.model.User;
@@ -202,5 +203,43 @@ public class AuthService {
         userRepository.save(user);
 
         return true;
+    }
+
+    public AuthResponse adminRegister(AdminRegisterRequest adminRegisterRequest) {
+        if (userRepository.existsByEmail(adminRegisterRequest.getEmail())) {
+            throw new RuntimeException("El email ya está registrado");
+        }
+
+        User user = new User();
+        user.setEmail(adminRegisterRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(adminRegisterRequest.getPassword()));
+        user.setFullName(adminRegisterRequest.getFullName());
+        user.setPhone(adminRegisterRequest.getPhone());
+        user.setRole(adminRegisterRequest.getRole());
+        user.setEmailVerified(true);
+
+        User savedUser = userRepository.save(user);
+
+        String jwt = tokenProvider.generateToken(savedUser.getId());
+
+        return new AuthResponse(jwt, savedUser.getId(), savedUser.getEmail(), 
+                              savedUser.getFullName(), savedUser.getRole());
+    }
+
+    public User changeUserRole(String userId, Role newRole) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Role previousRole = user.getRole();
+        
+        user.setRole(newRole);
+        user.setUpdatedAt(java.time.LocalDateTime.now());
+
+        User updatedUser = userRepository.save(user);
+
+        System.out.println("Rol cambiado para usuario " + user.getEmail() + 
+                          ": " + previousRole + " -> " + newRole);
+
+        return updatedUser;
     }
 }

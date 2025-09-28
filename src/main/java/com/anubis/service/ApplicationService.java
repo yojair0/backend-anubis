@@ -36,7 +36,6 @@ public class ApplicationService {
     private EmailService emailService;
 
     public Application createApplication(String userId, ApplicationRequest request) {
-        // Verificar que la mascota existe y está disponible
         Pet pet = petRepository.findById(request.getPetId())
             .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
 
@@ -44,13 +43,13 @@ public class ApplicationService {
             throw new RuntimeException("La mascota no está disponible para adopción");
         }
 
-        // Verificar que el usuario no haya postulado ya para esta mascota
         if (applicationRepository.existsByUserIdAndPetId(userId, request.getPetId())) {
             throw new RuntimeException("Ya has postulado para esta mascota");
         }
 
-        // Crear la postulación
-        Application application = new Application(userId, request.getPetId(), request.getMessage());
+        Application application = new Application(userId, request.getPetId(), request.getReason(), 
+                                                 request.getExperience(), request.getLivingSpace(), 
+                                                 request.getHasOtherPets(), request.getWorkSchedule());
         
         return applicationRepository.save(application);
     }
@@ -64,10 +63,8 @@ public class ApplicationService {
     }
 
     public List<Application> getApplicationsByFoundation(String foundationId) {
-        // Obtener todas las mascotas de la fundación
         List<Pet> foundationPets = petRepository.findByFoundationId(foundationId);
         
-        // Obtener todas las postulaciones para esas mascotas
         return foundationPets.stream()
             .flatMap(pet -> applicationRepository.findByPetId(pet.getId()).stream())
             .toList();
@@ -77,7 +74,6 @@ public class ApplicationService {
         Application application = applicationRepository.findById(applicationId)
             .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
 
-        // Verificar que la mascota pertenece a la fundación
         Pet pet = petRepository.findById(application.getPetId())
             .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
 
@@ -85,7 +81,6 @@ public class ApplicationService {
             throw new RuntimeException("No tienes permisos para modificar esta postulación");
         }
 
-        // Actualizar el estado
         application.setStatus(request.getStatus());
         application.setFoundationResponse(request.getFoundationResponse());
         application.setUpdatedAt(LocalDateTime.now());
@@ -149,7 +144,6 @@ public class ApplicationService {
         return applicationRepository.findByStatus(status).size();
     }
 
-    // Métodos nuevos con datos detallados
     public List<ApplicationDetailResponse> getDetailedApplicationsByUser(String userId) {
         List<Application> applications = applicationRepository.findByUserId(userId);
         return applications.stream()
