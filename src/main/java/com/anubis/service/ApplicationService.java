@@ -176,4 +176,18 @@ public class ApplicationService {
         }
         return Optional.empty();
     }
+
+    public List<Application> getAllApplications() {
+        return applicationRepository.findAll();
+    }
+
+    public List<ApplicationDetailResponse> getAllDetailedApplications() {
+        return applicationRepository.findAll().stream()
+            .map(app -> {
+                Pet pet = petRepository.findById(app.getPetId()).orElse(null);
+                User user = userRepository.findById(app.getUserId()).orElse(null);
+                return new ApplicationDetailResponse(app, pet, user);
+            })
+            .collect(Collectors.toList());
+    }
 }

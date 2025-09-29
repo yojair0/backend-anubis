@@ -99,7 +99,8 @@ public class ApplicationController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllApplications() {
         try {
-            return ResponseEntity.ok(new MessageResponse("Endpoint disponible para administradores"));
+            List<Application> applications = applicationService.getAllApplications();
+            return ResponseEntity.ok(applications);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }
