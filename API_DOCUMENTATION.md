@@ -230,7 +230,7 @@ Ver archivo `.env.example` para las variables requeridas.
 }
 ```
 
-### 3. Crear Mascota (Administrador y Fundación)
+### 3. Crear Mascota (Fundación)
 **POST** `/api/pets`
 
 **Headers:**
@@ -246,6 +246,7 @@ Content-Type: application/json
   "species": "Perro",
   "breed": "Labrador",
   "age": 2,
+  "gender": "Macho",
   "description": "Un perro muy cariñoso y jugueton",
   "imageUrl": "https://example.com/buddy.jpg"
 }

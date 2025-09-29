@@ -20,7 +20,7 @@ public class PetRequest {
     @Min(value = 0, message = "La edad debe ser mayor o igual a 0")
     private Integer age;
     
-    @NotBlank(message = "Género es requerido")
+    @NotBlank(message = "Genero es requerido")
     private String gender;
     
     private String size;

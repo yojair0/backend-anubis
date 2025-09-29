@@ -93,7 +93,7 @@ public class PetController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('FOUNDATION')")
     public ResponseEntity<?> createPet(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody PetRequest petRequest) {

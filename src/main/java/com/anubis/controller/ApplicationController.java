@@ -69,7 +69,7 @@ public class ApplicationController {
     }
 
     @PutMapping("/{applicationId}/status")
-    @PreAuthorize("hasRole('FOUNDATION')")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
     public ResponseEntity<?> updateApplicationStatus(
             @PathVariable String applicationId,
             @AuthenticationPrincipal UserPrincipal userPrincipal,
