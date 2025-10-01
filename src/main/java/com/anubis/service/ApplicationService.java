@@ -85,7 +85,6 @@ public class ApplicationService {
         application.setFoundationResponse(request.getFoundationResponse());
         application.setUpdatedAt(LocalDateTime.now());
 
-        // Si se acepta la postulación, cambiar el estado de la mascota
         if (request.getStatus() == ApplicationStatus.ACCEPTED) {
             pet.setStatus(PetStatus.IN_PROCESS);
             pet.setUpdatedAt(LocalDateTime.now());
@@ -98,7 +97,7 @@ public class ApplicationService {
             for (Application otherApp : otherApplications) {
                 if (!otherApp.getId().equals(applicationId)) {
                     otherApp.setStatus(ApplicationStatus.REJECTED);
-                    otherApp.setFoundationResponse("La mascota ya fue asignada a otro adoptante");
+                    otherApp.setFoundationResponse(request.getFoundationResponse());
                     otherApp.setUpdatedAt(LocalDateTime.now());
                     applicationRepository.save(otherApp);
                     
@@ -110,7 +109,7 @@ public class ApplicationService {
                             otherUser.getFullName(),
                             pet.getName(),
                             "REJECTED",
-                            "La mascota ya fue asignada a otro adoptante"
+                            request.getFoundationResponse()
                         );
                     }
                 }

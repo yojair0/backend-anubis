@@ -94,18 +94,6 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/clear-all-data")
-    public ResponseEntity<?> clearAllData() {
-        try {
-            userRepository.deleteAll();
-            applicationRepository.deleteAll();
-            
-            return ResponseEntity.ok().body("Todos los datos han sido eliminados exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al eliminar datos: " + e.getMessage());
-        }
-    }
-
     @GetMapping("/count-data")
     public ResponseEntity<?> countData() {
         try {

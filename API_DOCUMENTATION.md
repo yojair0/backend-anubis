@@ -573,7 +573,7 @@ Content-Type: application/json
 }
 ```
 
-**⚠️ Nota de Seguridad:** Este endpoint crea usuarios sin verificación de email. Los usuarios creados por admin están pre-verificados.
+**Importante:** Este endpoint crea usuarios sin verificación de email. Los usuarios creados por admin están pre-verificados.
 
 ### 6. Cambiar Rol de Usuario (Solo Administrador)
 **PUT** `/api/admin/users/{userId}/role`
@@ -609,22 +609,7 @@ Content-Type: application/json
 }
 ```
 
-### 7. Limpiar Todos los Datos (Solo Administrador)
-**DELETE** `/api/admin/clear-all-data`
-
-**Headers:**
-```
-Authorization: Bearer {token}
-```
-
-**Response:**
-```json
-{
-  "message": "Todos los datos han sido eliminados exitosamente"
-}
-```
-
-### 6. Estadísticas del Sistema (Solo Administrador)
+### 7. Estadísticas del Sistema (Solo Administrador)
 **GET** `/api/admin/stats`
 
 **Headers:**

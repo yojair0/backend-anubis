@@ -99,7 +99,7 @@ public class EmailService {
                 
             String statusText = "ACCEPTED".equals(status) ?
                 "¡Felicitaciones! Tu postulación para adoptar a " + petName + " ha sido ACEPTADA." :
-                "Tu postulación para adoptar a " + petName + " ha sido " + status.toLowerCase() + ".";
+                "Tu postulación para adoptar a " + petName + " ha sido RECHAZADA.";
             
             String text = String.format(
                 "Hola %s,\n\n" +
@@ -107,10 +107,11 @@ public class EmailService {
                 "%s\n\n" +
                 "Puedes revisar el estado de todas tus postulaciones en tu panel de usuario.\n\n" +
                 "¡Gracias por ser parte de nuestra comunidad!\n\n" +
-                "El equipo de %s .",
+                "El equipo de %s.",
                 fullName, statusText, 
+                ("REJECTED".equals(status) || "RECHAZADA".equals(status)) && 
                 (foundationResponse != null && !foundationResponse.trim().isEmpty()) ? 
-                    "Mensaje de la fundación: " + foundationResponse : "",
+                    "Razón del rechazo: " + foundationResponse : "",
                 appName
             );
             
