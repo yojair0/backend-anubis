@@ -23,22 +23,28 @@ jobs:
         
     - name: Show Coverage Results
       run: |
-        echo "=== COVERAGE RESULTS ==="
-        if [ -f target/site/jacoco/index.html ]; then
-          echo "Coverage report generated successfully"
-          echo "Report location: target/site/jacoco/index.html"
+        echo "Backend Coverage Analysis"
+        
+        if [ -f target/site/jacoco/jacoco.xml ]; then
+          TOTAL_INSTRUCTIONS=$(grep -o 'type="INSTRUCTION".*missed="[0-9]*".*covered="[0-9]*"' target/site/jacoco/jacoco.xml | head -1 | sed 's/.*missed="\([0-9]*\)".*covered="\([0-9]*\)".*/\1 \2/')
           
-          # Show coverage results
-          echo "Backend Coverage Analysis Complete"
-          echo "Total Instructions: 4818"
-          echo "Instructions Covered: 2909" 
-          echo "Instructions Missed: 1909"
-          echo "COVERAGE ACHIEVED: 60%"
-          echo "Calculation: (2909 covered / 4818 total) * 100 = 60%"
-          echo "Coverage Goal Met: 60% > 55% (baseline improved)"
-          
-          echo "Test execution completed successfully"
-          
+          if [ ! -z "$TOTAL_INSTRUCTIONS" ]; then
+            MISSED=$(echo $TOTAL_INSTRUCTIONS | cut -d' ' -f1)
+            COVERED=$(echo $TOTAL_INSTRUCTIONS | cut -d' ' -f2)
+            TOTAL=$((MISSED + COVERED))
+            
+            if [ $TOTAL -gt 0 ]; then
+              PERCENTAGE=$((COVERED * 100 / TOTAL))
+              
+              echo "Total Instructions: $TOTAL"
+              echo "Instructions Covered: $COVERED"
+              echo "Coverage Percentage: $PERCENTAGE%"
+            else
+              echo "No coverage data available"
+            fi
+          else
+            echo "Could not parse coverage data"
+          fi
         else
           echo "Coverage report not found"
         fi
