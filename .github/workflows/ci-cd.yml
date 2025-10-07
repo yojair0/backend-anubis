@@ -23,8 +23,24 @@ jobs:
         
     - name: Show Coverage Results
       run: |
-        echo "Tests completed successfully"
-        echo "Coverage report generated at target/site/jacoco/index.html"
+        echo "=== COVERAGE RESULTS ==="
         if [ -f target/site/jacoco/index.html ]; then
-          echo "Coverage percentage: 60%"
+          echo "Coverage report generated successfully"
+          echo "Report location: target/site/jacoco/index.html"
+          
+          # Extract actual coverage percentage from XML
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            COVERAGE=$(grep -o 'covered="[0-9]*"' target/site/jacoco/jacoco.xml | head -1 | grep -o '[0-9]*')
+            MISSED=$(grep -o 'missed="[0-9]*"' target/site/jacoco/jacoco.xml | head -1 | grep -o '[0-9]*')
+            if [ ! -z "$COVERAGE" ] && [ ! -z "$MISSED" ]; then
+              TOTAL=$((COVERAGE + MISSED))
+              PERCENTAGE=$((COVERAGE * 100 / TOTAL))
+              echo "Instructions Coverage: $COVERAGE/$TOTAL ($PERCENTAGE%)"
+            fi
+          fi
+          
+          echo "Test execution completed successfully"
+          
+        else
+          echo "Coverage report not found"
         fi
