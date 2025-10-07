@@ -23,10 +23,8 @@ jobs:
         
     - name: Show Coverage Results
       run: |
-        echo "Backend Coverage Analysis"
-        
         if [ -f target/site/jacoco/jacoco.xml ]; then
-          TOTAL_INSTRUCTIONS=$(grep -o 'type="INSTRUCTION".*missed="[0-9]*".*covered="[0-9]*"' target/site/jacoco/jacoco.xml | head -1 | sed 's/.*missed="\([0-9]*\)".*covered="\([0-9]*\)".*/\1 \2/')
+          TOTAL_INSTRUCTIONS=$(grep -o 'type="INSTRUCTION".*missed="[0-9]*".*covered="[0-9]*"' target/site/jacoco/jacoco.xml | tail -1 | sed 's/.*missed="\([0-9]*\)".*covered="\([0-9]*\)".*/\1 \2/')
           
           if [ ! -z "$TOTAL_INSTRUCTIONS" ]; then
             MISSED=$(echo $TOTAL_INSTRUCTIONS | cut -d' ' -f1)
@@ -35,16 +33,13 @@ jobs:
             
             if [ $TOTAL -gt 0 ]; then
               PERCENTAGE=$((COVERED * 100 / TOTAL))
-              
-              echo "Total Instructions: $TOTAL"
-              echo "Instructions Covered: $COVERED"
-              echo "Coverage Percentage: $PERCENTAGE%"
+              echo "Backend Coverage: $PERCENTAGE%"
             else
-              echo "No coverage data available"
+              echo "Coverage: No data"
             fi
           else
-            echo "Could not parse coverage data"
+            echo "Coverage: Parse error"
           fi
         else
-          echo "Coverage report not found"
+          echo "Coverage: Report not found"
         fi
