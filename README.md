@@ -2,6 +2,8 @@
 
 Backend REST API para sistema de adopción de mascotas desarrollado con Spring Boot 3.1.0 y MongoDB.
 
+Version: 1.0.0
+
 ## 📊 Estado del Proyecto
 
 ![CI/CD Pipeline](https://github.com/yojair0/backend-anubis/actions/workflows/ci-cd.yml/badge.svg)
