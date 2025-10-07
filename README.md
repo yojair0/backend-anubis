@@ -7,6 +7,7 @@ Backend REST API para sistema de adopción de mascotas desarrollado con Spring B
 ![CI/CD Pipeline](https://github.com/yojair0/backend-anubis/actions/workflows/ci-cd.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-60%25-green)
 ![Tests](https://img.shields.io/badge/tests-371%20passing-brightgreen)
+![Build](https://img.shields.io/badge/build-passing-success)
 ![Java](https://img.shields.io/badge/java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/spring%20boot-3.1.0-brightgreen)
 

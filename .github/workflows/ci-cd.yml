@@ -29,27 +29,15 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Setup MongoDB Atlas Environment
-      env:
-        MONGO_URI: ${{ secrets.MONGO_URI }}
-        GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+    - name: Setup Test Environment
       run: |
-        echo "MongoDB Atlas configurado para tests"
-        echo "Variables de entorno configuradas"
+        echo "Setting up test environment"
+        echo "Using test profile for MongoDB"
 
-    - name: Ejecutar Tests
-      env:
-        MONGO_URI: ${{ secrets.MONGO_URI }}
-        GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-      run: mvn clean test
+    - name: Run Tests
+      run: mvn clean test -Dspring.profiles.active=test
 
-    - name: Generar Reporte de Cobertura
-      env:
-        MONGO_URI: ${{ secrets.MONGO_URI }}
-        GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+    - name: Generate Coverage Report
       run: mvn jacoco:report
 
     - name: Upload coverage reports to Codecov
