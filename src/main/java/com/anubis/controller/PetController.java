@@ -17,14 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.anubis.dto.PetRequest;
 import com.anubis.model.Pet;
 import com.anubis.model.PetStatus;
 import com.anubis.security.UserPrincipal;
 import com.anubis.service.PetService;
-import com.anubis.service.FileUploadService;
 
 import jakarta.validation.Valid;
 
@@ -35,9 +33,6 @@ public class PetController {
 
     @Autowired
     private PetService petService;
-
-    @Autowired
-    private FileUploadService fileUploadService;
 
     public static class MessageResponse {
         private String message;
@@ -55,21 +50,7 @@ public class PetController {
         }
     }
 
-    public static class ImageUploadResponse {
-        private String imageUrl;
 
-        public ImageUploadResponse(String imageUrl) {
-            this.imageUrl = imageUrl;
-        }
-
-        public String getImageUrl() {
-            return imageUrl;
-        }
-
-        public void setImageUrl(String imageUrl) {
-            this.imageUrl = imageUrl;
-        }
-    }
 
     @GetMapping
     public ResponseEntity<List<Pet>> getAllPets() {
@@ -93,7 +74,7 @@ public class PetController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('FOUNDATION')")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
     public ResponseEntity<?> createPet(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody PetRequest petRequest) {
@@ -205,21 +186,11 @@ public class PetController {
     }
 
     @GetMapping("/foundation/my-pets")
-    @PreAuthorize("hasRole('FOUNDATION')")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
     public ResponseEntity<List<Pet>> getMyPets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         List<Pet> pets = petService.getPetsByFoundation(userPrincipal.getId());
         return ResponseEntity.ok(pets);
     }
 
-    @PostMapping("/upload-image")
-    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
-    public ResponseEntity<?> uploadPetImage(@RequestParam("file") MultipartFile file) {
-        try {
-            String imageUrl = fileUploadService.uploadPetImage(file);
-            return ResponseEntity.ok(new ImageUploadResponse(imageUrl));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new MessageResponse("Error: " + e.getMessage()));
-        }
-    }
+
 }

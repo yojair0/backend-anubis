@@ -65,7 +65,6 @@ public class SecurityConfig {
                 // Rutas públicas
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/pets", "/api/pets/**").permitAll()
-                .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/health").permitAll()
                 .requestMatchers("/api/admin/clear-all-data").permitAll()
                 .requestMatchers("/api/admin/count-data").permitAll()

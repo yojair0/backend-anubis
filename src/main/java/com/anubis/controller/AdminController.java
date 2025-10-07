@@ -15,16 +15,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.validation.Valid;
 
 import com.anubis.dto.AdminRegisterRequest;
+import com.anubis.dto.ApplicationDetailResponse;
+import com.anubis.dto.ApplicationStatusRequest;
 import com.anubis.dto.AuthResponse;
 import com.anubis.dto.ChangeRoleRequest;
+import com.anubis.model.Application;
 import com.anubis.model.User;
 import com.anubis.repository.ApplicationRepository;
 import com.anubis.repository.PetRepository;
 import com.anubis.repository.UserRepository;
+import com.anubis.service.ApplicationService;
 import com.anubis.service.AuthService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -44,6 +49,9 @@ public class AdminController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private ApplicationService applicationService;
+
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
         try {
@@ -51,6 +59,54 @@ public class AdminController {
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
+        }
+    }
+
+    // ===== ENDPOINTS DE APLICACIONES PARA ADMIN =====
+
+    @GetMapping("/applications")
+    public ResponseEntity<List<ApplicationDetailResponse>> getAllApplications() {
+        try {
+            List<ApplicationDetailResponse> applications = applicationService.getAllDetailedApplications();
+            return ResponseEntity.ok(applications);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PutMapping("/applications/{applicationId}/status")
+    public ResponseEntity<Application> updateApplicationStatus(
+            @PathVariable String applicationId,
+            @RequestBody ApplicationStatusRequest request) {
+        try {
+            Application updatedApplication = applicationService.updateApplicationStatusAsAdmin(applicationId, request);
+            return ResponseEntity.ok(updatedApplication);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @DeleteMapping("/applications/{applicationId}")
+    public ResponseEntity<?> deleteApplication(@PathVariable String applicationId) {
+        try {
+            applicationService.deleteApplicationAsAdmin(applicationId);
+            return ResponseEntity.ok().body("Postulación eliminada exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al eliminar postulación: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/applications/{applicationId}")
+    public ResponseEntity<ApplicationDetailResponse> getApplicationById(@PathVariable String applicationId) {
+        try {
+            Optional<ApplicationDetailResponse> application = applicationService.getDetailedApplicationById(applicationId);
+            if (application.isPresent()) {
+                return ResponseEntity.ok(application.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(404).build();
         }
     }
 

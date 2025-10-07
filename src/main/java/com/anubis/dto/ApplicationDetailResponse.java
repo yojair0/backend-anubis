@@ -15,23 +15,27 @@ public class ApplicationDetailResponse {
     private String petName;
     private String petSpecies;
     private String petBreed;
-    private String reason;
-    private String experience;
-    private String livingSpace;
-    private boolean hasOtherPets;
-    private String workSchedule;
+    private String message;
     private ApplicationStatus status;
     private String foundationResponse;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    // Campos adicionales de la aplicación
+    private String reason;
+    private String experience;
+    private String livingSpace;
+    private Boolean hasOtherPets;
+    private String workSchedule;
 
+    // Constructores
     public ApplicationDetailResponse() {}
 
     public ApplicationDetailResponse(String id, String userId, String userFullName, String userEmail, 
                                    String userPhone, String petId, String petName, String petSpecies, 
-                                   String petBreed, String reason, String experience, String livingSpace,
-                                   boolean hasOtherPets, String workSchedule, ApplicationStatus status, 
-                                   String foundationResponse, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                                   String petBreed, String message, ApplicationStatus status, 
+                                   String foundationResponse, LocalDateTime createdAt, LocalDateTime updatedAt,
+                                   String reason, String experience, String livingSpace, Boolean hasOtherPets, String workSchedule) {
         this.id = id;
         this.userId = userId;
         this.userFullName = userFullName;
@@ -41,17 +45,19 @@ public class ApplicationDetailResponse {
         this.petName = petName;
         this.petSpecies = petSpecies;
         this.petBreed = petBreed;
+        this.message = message;
+        this.status = status;
+        this.foundationResponse = foundationResponse;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.reason = reason;
         this.experience = experience;
         this.livingSpace = livingSpace;
         this.hasOtherPets = hasOtherPets;
         this.workSchedule = workSchedule;
-        this.status = status;
-        this.foundationResponse = foundationResponse;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
+    // Constructor que toma objetos Application, Pet y User
     public ApplicationDetailResponse(com.anubis.model.Application application, 
                                    com.anubis.model.Pet pet, 
                                    com.anubis.model.User user) {
@@ -81,6 +87,7 @@ public class ApplicationDetailResponse {
         }
     }
 
+    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -153,44 +160,12 @@ public class ApplicationDetailResponse {
         this.petBreed = petBreed;
     }
 
-    public String getReason() {
-        return reason;
+    public String getMessage() {
+        return message;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public String getExperience() {
-        return experience;
-    }
-
-    public void setExperience(String experience) {
-        this.experience = experience;
-    }
-
-    public String getLivingSpace() {
-        return livingSpace;
-    }
-
-    public void setLivingSpace(String livingSpace) {
-        this.livingSpace = livingSpace;
-    }
-
-    public boolean isHasOtherPets() {
-        return hasOtherPets;
-    }
-
-    public void setHasOtherPets(boolean hasOtherPets) {
-        this.hasOtherPets = hasOtherPets;
-    }
-
-    public String getWorkSchedule() {
-        return workSchedule;
-    }
-
-    public void setWorkSchedule(String workSchedule) {
-        this.workSchedule = workSchedule;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public ApplicationStatus getStatus() {
@@ -225,6 +200,47 @@ public class ApplicationDetailResponse {
         this.updatedAt = updatedAt;
     }
 
+    // Getters y setters para los nuevos campos
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+
+    public String getLivingSpace() {
+        return livingSpace;
+    }
+
+    public void setLivingSpace(String livingSpace) {
+        this.livingSpace = livingSpace;
+    }
+
+    public Boolean getHasOtherPets() {
+        return hasOtherPets;
+    }
+
+    public void setHasOtherPets(Boolean hasOtherPets) {
+        this.hasOtherPets = hasOtherPets;
+    }
+
+    public String getWorkSchedule() {
+        return workSchedule;
+    }
+
+    public void setWorkSchedule(String workSchedule) {
+        this.workSchedule = workSchedule;
+    }
+
     @Override
     public String toString() {
         return "ApplicationDetailResponse{" +
@@ -237,15 +253,16 @@ public class ApplicationDetailResponse {
                 ", petName='" + petName + '\'' +
                 ", petSpecies='" + petSpecies + '\'' +
                 ", petBreed='" + petBreed + '\'' +
+                ", message='" + message + '\'' +
+                ", status=" + status +
+                ", foundationResponse='" + foundationResponse + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 ", reason='" + reason + '\'' +
                 ", experience='" + experience + '\'' +
                 ", livingSpace='" + livingSpace + '\'' +
                 ", hasOtherPets=" + hasOtherPets +
                 ", workSchedule='" + workSchedule + '\'' +
-                ", status=" + status +
-                ", foundationResponse='" + foundationResponse + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
                 '}';
     }
 }

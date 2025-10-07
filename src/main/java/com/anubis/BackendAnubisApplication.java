@@ -20,9 +20,9 @@ public class BackendAnubisApplication {
                 System.setProperty(entry.getKey(), entry.getValue());
             });
             
-            System.out.println("✅ Archivo .env cargado correctamente");
+            System.out.println("Environment file loaded successfully");
         } catch (Exception e) {
-            System.out.println("⚠️ No se pudo cargar .env: " + e.getMessage());
+            System.out.println("Could not load .env file: " + e.getMessage());
         }
         
         SpringApplication.run(BackendAnubisApplication.class, args);

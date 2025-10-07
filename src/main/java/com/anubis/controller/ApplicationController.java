@@ -1,18 +1,28 @@
 package com.anubis.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.anubis.dto.ApplicationRequest;
 import com.anubis.dto.ApplicationStatusRequest;
 import com.anubis.model.Application;
 import com.anubis.security.UserPrincipal;
 import com.anubis.service.ApplicationService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -58,7 +68,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/foundation/my-applications")
-    @PreAuthorize("hasRole('FOUNDATION')")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
     public ResponseEntity<?> getFoundationApplications(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
             List<Application> applications = applicationService.getApplicationsByFoundation(userPrincipal.getId());
@@ -75,8 +85,15 @@ public class ApplicationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody ApplicationStatusRequest request) {
         try {
-            Application application = applicationService.updateApplicationStatus(
-                applicationId, userPrincipal.getId(), request);
+            Application application;
+            // Si es ADMIN, puede modificar cualquier postulación
+            if (userPrincipal.getAuthorities().toString().contains("ADMIN")) {
+                application = applicationService.updateApplicationStatusAsAdmin(applicationId, request);
+            } else {
+                // Si es FOUNDATION, solo puede modificar sus propias postulaciones
+                application = applicationService.updateApplicationStatus(
+                    applicationId, userPrincipal.getId(), request);
+            }
             return ResponseEntity.ok(application);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
@@ -101,6 +118,25 @@ public class ApplicationController {
         try {
             List<Application> applications = applicationService.getAllApplications();
             return ResponseEntity.ok(applications);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{applicationId}")
+    @PreAuthorize("hasRole('FOUNDATION') or hasRole('ADMIN')")
+    public ResponseEntity<?> deleteApplication(
+            @PathVariable String applicationId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        try {
+            // Si es ADMIN, puede eliminar cualquier postulación
+            if (userPrincipal.getAuthorities().toString().contains("ADMIN")) {
+                applicationService.deleteApplicationAsAdmin(applicationId);
+            } else {
+                // Si es FOUNDATION, solo puede eliminar postulaciones de sus mascotas
+                applicationService.deleteApplication(applicationId, userPrincipal.getId());
+            }
+            return ResponseEntity.ok(new MessageResponse("Postulación eliminada exitosamente"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: " + e.getMessage()));
         }

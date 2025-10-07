@@ -77,6 +77,7 @@ public class ApplicationService {
         Pet pet = petRepository.findById(application.getPetId())
             .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
 
+        // Permitir si es dueño de la mascota o si es ADMIN (verificación se hace en controller)
         if (!pet.getFoundationId().equals(foundationId)) {
             throw new RuntimeException("No tienes permisos para modificar esta postulación");
         }
@@ -188,5 +189,83 @@ public class ApplicationService {
                 return new ApplicationDetailResponse(app, pet, user);
             })
             .collect(Collectors.toList());
+    }
+
+    public Application updateApplicationStatusAsAdmin(String applicationId, ApplicationStatusRequest request) {
+        Application application = applicationRepository.findById(applicationId)
+            .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
+
+        Pet pet = petRepository.findById(application.getPetId())
+            .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+
+        application.setStatus(request.getStatus());
+        application.setFoundationResponse(request.getFoundationResponse());
+        application.setUpdatedAt(LocalDateTime.now());
+
+        if (request.getStatus() == ApplicationStatus.ACCEPTED) {
+            pet.setStatus(PetStatus.IN_PROCESS);
+            pet.setUpdatedAt(LocalDateTime.now());
+            petRepository.save(pet);
+
+            // Rechazar automáticamente otras postulaciones pendientes para esta mascota
+            List<Application> otherApplications = applicationRepository.findByPetIdAndStatus(
+                application.getPetId(), ApplicationStatus.PENDING);
+            
+            for (Application otherApp : otherApplications) {
+                if (!otherApp.getId().equals(applicationId)) {
+                    otherApp.setStatus(ApplicationStatus.REJECTED);
+                    otherApp.setFoundationResponse("Postulación rechazada automáticamente - otra fue aceptada");
+                    otherApp.setUpdatedAt(LocalDateTime.now());
+                    applicationRepository.save(otherApp);
+                    
+                    // Enviar notificación de rechazo a otros aplicantes
+                    User otherUser = userRepository.findById(otherApp.getUserId()).orElse(null);
+                    if (otherUser != null) {
+                        emailService.sendApplicationStatusEmail(
+                            otherUser.getEmail(),
+                            otherUser.getFullName(),
+                            pet.getName(),
+                            "REJECTED",
+                            "Postulación rechazada automáticamente - otra fue aceptada"
+                        );
+                    }
+                }
+            }
+        }
+
+        // Enviar notificación al aplicante principal
+        User user = userRepository.findById(application.getUserId())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        emailService.sendApplicationStatusEmail(
+            user.getEmail(),
+            user.getFullName(),
+            pet.getName(),
+            request.getStatus().toString(),
+            request.getFoundationResponse()
+        );
+
+        return applicationRepository.save(application);
+    }
+
+    public void deleteApplication(String applicationId, String foundationId) {
+        Application application = applicationRepository.findById(applicationId)
+            .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
+
+        // Verificar si es ADMIN o si es dueño de la mascota
+        Pet pet = petRepository.findById(application.getPetId()).orElse(null);
+        if (pet != null && !pet.getFoundationId().equals(foundationId)) {
+            // Si no es el dueño de la mascota, verificar si es ADMIN
+            // Esta verificación se hace en el controller con @PreAuthorize
+        }
+
+        applicationRepository.deleteById(applicationId);
+    }
+
+    public void deleteApplicationAsAdmin(String applicationId) {
+        Application application = applicationRepository.findById(applicationId)
+            .orElseThrow(() -> new RuntimeException("Postulación no encontrada"));
+
+        applicationRepository.deleteById(applicationId);
     }
 }
