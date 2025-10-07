@@ -1,44 +1,30 @@
-name: CI/CD Pipeline - Backend Anubis
+name: CI - Backend Tests
 
 on:
   push:
     branches: [ main, continuacion-backend ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: Test and Coverage
-
+    
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
+    
     - name: Setup Java 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-
-    - name: Cache Maven dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-
-    - name: Setup Test Environment
+        
+    - name: Run Tests and Coverage
       run: |
-        echo "Setting up test environment"
-        echo "Using test profile for MongoDB"
-
-    - name: Run Tests
-      run: mvn clean test -Dspring.profiles.active=test
-
-    - name: Generate Coverage Report
-      run: mvn jacoco:report
+        mvn clean test jacoco:report --batch-mode --quiet
+        
+    - name: Display Coverage
+      run: |
+        echo "Test Coverage Report Generated"
+        echo "Check target/site/jacoco/index.html for detailed coverage"
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
