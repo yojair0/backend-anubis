@@ -255,8 +255,6 @@ public class ApplicationService {
         // Verificar si es ADMIN o si es dueño de la mascota
         Pet pet = petRepository.findById(application.getPetId()).orElse(null);
         if (pet != null && !pet.getFoundationId().equals(foundationId)) {
-            // Si no es el dueño de la mascota, verificar si es ADMIN
-            // Esta verificación se hace en el controller con @PreAuthorize
         }
 
         applicationRepository.deleteById(applicationId);
