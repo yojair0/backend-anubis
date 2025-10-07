@@ -1,5 +1,7 @@
 # API Backend Anubis - Documentación
 
+Estado: Funcionando correctamente - 371 tests pasando
+
 ## URL Base
 ```
 http://localhost:8081
