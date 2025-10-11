@@ -62,10 +62,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                // Rutas públicas
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/pets", "/api/pets/**").permitAll()
+                // Rutas públicas - orden más específico primero
                 .requestMatchers("/health").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/pets/**").permitAll()
+                .requestMatchers("/api/pets").permitAll()
                 .requestMatchers("/api/admin/clear-all-data").permitAll()
                 .requestMatchers("/api/admin/count-data").permitAll()
                 // Rutas de usuario autenticado
@@ -91,10 +92,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(",")));
+        configuration.addAllowedOrigin("*"); // Permitir todos los orígenes temporalmente
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false); // Cambiar a false cuando se usa "*"
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
