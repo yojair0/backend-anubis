@@ -37,11 +37,12 @@ RUN chown spring:spring app.jar
 # Cambiar a usuario no root
 USER spring:spring
 
-# Exponer puerto
-EXPOSE 8081
+# Exponer puerto (Railway usa PORT dinámico)
+EXPOSE ${PORT:-8081}
 
 # Variables de entorno por defecto
 ENV JAVA_OPTS="-Xms256m -Xmx512m"
+ENV SPRING_PROFILES_ACTIVE=production
 
 # Comando de inicio con opciones de JVM
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
