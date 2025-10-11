@@ -1,14 +1,11 @@
 # Etapa de construcción
-FROM maven:3.9.4-openjdk-17-slim AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 
 # Establecer directorio de trabajo
 WORKDIR /app
 
 # Copiar archivos de configuración Maven
 COPY pom.xml .
-COPY mvnw .
-COPY mvnw.cmd .
-COPY .mvn .mvn
 
 # Descargar dependencias (aprovechando cache de Docker)
 RUN mvn dependency:go-offline -B
@@ -19,8 +16,8 @@ COPY src ./src
 # Construir la aplicación
 RUN mvn clean package -DskipTests
 
-# Etapa de ejecución
-FROM openjdk:17-jdk-slim
+# Etapa de ejecución  
+FROM eclipse-temurin:17-jre
 
 # Crear usuario no root para seguridad
 RUN addgroup --system spring && adduser --system spring --ingroup spring
