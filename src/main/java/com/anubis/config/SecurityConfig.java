@@ -64,6 +64,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Rutas públicas - orden más específico primero
                 .requestMatchers("/health").permitAll()
+                .requestMatchers("/api/test/**").permitAll() // Test endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/pets/**").permitAll()
                 .requestMatchers("/api/pets").permitAll()
